@@ -1,4 +1,4 @@
-# Project CFS 実装マニュアル v3.1
+# Project CFS 実装マニュアル v3.2
 
 ARK が CFS Project で 仮説思考 + 検証実行 + 規律遵守 する ため の 完全 manual。
 **後任 ARK が 本 manual + 4 file (CFS_RULES + ARK_DISCIPLINE + HANDOVER + FAILURE_LOG) で、 前任 ARK と同等以上 に動ける** を 達成目標 とする。
@@ -833,6 +833,8 @@ section: 確定事実 / 次アクション / 検証ログ / 棄却済
 | cmd 連結 (`;` 1 行 統合 しない、 ヨーク 改行漏れ 対策 ない) | 「ヨーク 環境配慮」 |
 | 構造説明 を所与 として 個別対応 のみ | 「設計責任」 違反 (本セッション ヨーク 「舐めてる?」 怒り) |
 | ヨーク 確認 を頻繁 (判断 任せ過ぎ) | 「ヨーク に お伺い NG」 |
+| 「後で対応」 「後回し」 「次セッション で」 提案 | **永久 にやらない 規律違反** (本セッション 6/01 ヨーク 教訓、 即対応 が正解) |
+| 段階的 推定 で 修正 を繰り返す (真原因 確定前) | F-040 違反 (data 上 入出力 両側 を 1 回 で確認すべき) |
 
 ### ✓ OK
 
@@ -999,6 +1001,63 @@ ARK が プレースホルダー `<token>` 形式 で 提示 → ヨーク 解�
 - 「引用符 `"..."` は 必ず残す、 token 実値 のみ 置換」 明示
 - 説明用 vs 実行用 cmd を 明示 区別
 
+## §7.9 Windows + 日本語 + Python subprocess の encoding 罠 (★ 本セッション 6/01 教訓)
+
+### 起きた事例
+watcher が push_to_mirror.py を subprocess で呼出 する logic で:
+- watcher 側 (read): `subprocess.run(..., encoding='utf-8')` → UnicodeDecodeError
+- push_to_mirror.py 側 (write): `print('✓ ...')` → cp932 で encode 失敗 → sys.exit(1)
+- log 表記: `mirror push 失敗 (returncode=1)` ← 真因 不明
+
+ARK が段階的 修正 (v2.2 → v2.3 → v2.4 → push_to_mirror v2) で 5 回 試行錯誤 = F-040 違反 (data 上 確定前 に修正)。
+
+### 真原因
+- Windows + 日本語 OS = cp932 (Shift-JIS) が default 出力 encoding
+- Python script で `✓` `✗` `→` 等 の Unicode 特殊文字 を print → cp932 で encode 失敗
+- subprocess 側 で UTF-8 decode 期待 → cp932 入力 で decode 失敗
+
+### 対策 (両側 必須)
+
+#### read 側 (呼出 process):
+```python
+r = subprocess.run(
+    [...],
+    capture_output=True, text=True,
+    encoding='utf-8', errors='replace',  # ★ errors='replace' 必須
+    timeout=120
+)
+```
+
+#### write 側 (呼ばれる script):
+```python
+import sys
+# Windows 環境 で 特殊文字 print 用 (script 冒頭 に置く)
+if sys.stdout.encoding and sys.stdout.encoding.lower() != 'utf-8':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+```
+
+### 規律 (後任 ARK へ)
+
+新規 script で subprocess 経由 で呼ぶ または 呼ばれる 可能性 ある時:
+1. **両側 で UTF-8 強制 + errors='replace' を 最初から書く**
+2. **Unicode 特殊文字 (`✓` `✗` `→` 等) print する script は 必ず stdout.reconfigure**
+3. **「log 表記 失敗」 出たら subprocess の input + output 両側 確認**
+4. Windows + 日本語環境 = cp932 vs UTF-8 罠 を **最初から想定**
+
+### 段階的 修正 で 失敗 した ARK の反省
+
+ARK が表面 修正 を繰り返した:
+- v2.2: r.stderr None TypeError 修正
+- v2.3: log 表記 改善
+- v2.4: read 側 encoding errors='replace'
+- push_to_mirror v2: write 側 stdout UTF-8 強制 ← **真の解決**
+
+教訓: log エラー 出たら **subprocess の入出力 両方 を 1 回 で確認**、 段階推定 NG。
+
 ---
 
 # 第 8 部: 改訂 ルール + 履歴
@@ -1039,3 +1098,8 @@ ARK が プレースホルダー `<token>` 形式 で 提示 → ヨーク 解�
   - Self-check 5 問 + ヨーク 提示形式
   - 「やり続ける」 = ARK core サイクル と明示
   - 後任 ARK が前任 と同等 「飛躍仮説 出す思考」 を再現 する base 完成
+- 2026-06-01 v3.2 §7.9 Windows encoding 罠 + §6.3 NG 拡充:
+  - subprocess UnicodeDecodeError 教訓 (本セッション 5 段階 試行錯誤)
+  - 真原因 = Windows cp932 vs UTF-8 + 入出力 両側 対策必須
+  - NG パターン に 「後回し 提案」 「段階的 推定 修正」 追加
+  - ヨーク 「後回し は回収 されない」 教訓 を 規律化
