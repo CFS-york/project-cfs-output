@@ -1,7 +1,7 @@
 # 当日 検証結果 集約
 
 対象期間: 過去 24 時間
-検出 file: 18 件
+検出 file: 17 件
 検出 script: 9 件
 
 ## mult 統計 TOP (script 単位、 mult_max 降順)
