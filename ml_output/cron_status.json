@@ -1,0 +1,7 @@
+{
+  "last_run": "2026-06-03T02:40:34.509630+00:00",
+  "result": "failed",
+  "detail": "JSONDecodeError: Expecting ',' delimiter: line 2 column 666 (char 667)",
+  "consecutive_failures": 1,
+  "last_success": "never"
+}
