@@ -92,10 +92,11 @@ SLIP_CAP = 0.10        # 10%
 listed_min = 60        # 上場 60 日以上
 price_range = (100, 50000)
 
-# 必須 blacklist
+# 必須 blacklist (★ v2.3: cfs21異常検出で33銘柄に拡張、 clean_blacklist.csv 参照)
 ORIGINAL_BLACKLIST = {1689, 6731, 2593, 9434, 5076, 2164, 5074,
                       7172, 9264, 9318, 6628, 2553, 2629, 8256}
 KNOWN_ETF = {1321, 1330, 1320, 1306, 1308, 1305}
+# 拡張 blacklist は Results/ARK/cfs5/data_clean_check/clean_blacklist.csv ('code'列) を読込
 ```
 
 ### cache 構造 (重要、 詳細は §11 環境スキーマ 参照)
@@ -147,6 +148,30 @@ financial_cache.csv  # 列 19 個、 code4(object/str)、 date=発表日
 - HANDOVER_LATEST.md + FAILURE_LOG.md 自動整理
 - push_to_mirror.py で public mirror へ同期
 
+★ **v2.3 修正 (cron #7 失敗対応 + 自己検知ループ)**:
+- 真原因: max_tokens=8000 到達で出力途中切れ → JSON末尾欠落 → parse失敗 (HANDOVER肥大化が背景)
+- 修正1: handover_runner MAX_TOKENS 8000→16000
+- 修正2: parse を bracket-counting + 末尾補完 fallback で堅牢化 (正規表現の貪欲/非貪欲バグ回避)
+- 修正3: prompt の HANDOVER圧縮ルール強制 (16KB以内、古い検証ログは1行要約、棄却済はFAILURE_LOGへ)
+- ★修正4 (自己検知ループ): handover_runner が成功/失敗/skip いずれも `ml_output/cron_status.json` に記録
+  (全体 try/except + self-check + 連続失敗カウント)。yml に `if: always()` の status push step を追加し、
+  handover_runner が失敗しても cron_status を mirror に push。
+  → **後任ARKが起動時に mirror の cron_status.json を読み、人間の監視なしに cron健全性を自己検知** (§8.3)。
+  cron #7 は5日間 沈黙して気づかれなかった反省 = エラーを自己診断・記録・起動時確認する閉ループで再発防止。
+- self-check: 出力HANDOVERが参照用に足るか実行直後に診断 (サイズ・必須keyword)。情報欠落の疑いなら
+  既存HANDOVERを上書きせず保持 (壊さない)。
+
+#### cron_status.json の構造
+```json
+{
+  "last_run": "<UTC ISO>",
+  "result": "success | failed | skip",
+  "detail": "<OK or エラー内容 or self-check warning>",
+  "consecutive_failures": 0,
+  "last_success": "<UTC ISO or never/unknown>"
+}
+```
+
 ### physics_check (GitHub Actions)
 
 - scripts/ への push trigger で 起動
@@ -174,13 +199,15 @@ financial_cache.csv  # 列 19 個、 code4(object/str)、 date=発表日
 ARK 用 query (TOP、 filter、 summary)
 
 ### handover_runner.py
-cron から 呼ばれる、 Claude API で HANDOVER 整理
+cron から 呼ばれる、 Claude API で HANDOVER 整理。
+★ v2.3: max_tokens 16000 / bracket-counting parse / 圧縮ルール強制 / cron_status 記録 + self-check (§4)
 
 ### physics_validator.py
 scripts を Claude API で 物理整合 check
 
 ### push_to_mirror.py
-ml_output + ファイル2 を public mirror へ同期
+ml_output + ファイル2 を public mirror へ同期。
+★ v2.3: cron_status.json を同期対象に追加 (自己検知ループ)
 
 ---
 
@@ -256,9 +283,19 @@ ml_output + ファイル2 を public mirror へ同期
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/HANDOVER_LATEST.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/FAILURE_LOG.md
 3. 計 5 file を 統合 認識
-4. ヨーク 対話 開始
+4. ★ **cron 健全性 自己検知 (v2.3 追加)**: web_fetch で
+   - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/ml_output/cron_status.json
+   を取得し確認:
+   - `result == "failed"` または `consecutive_failures >= 1` → **cron が壊れている**。
+     仮説提案より先に handover_runner / yml / push_to_mirror を診断・修理 (§4 参照)。
+   - `last_success` が 数日以上前 → cron が動いていない疑い。同上。
+   - `result == "success"` かつ consecutive_failures == 0 → 正常、検証続行。
+   - cron_status.json が取得できない (404等) → mirror同期が止まっている疑い。ヨークに確認。
+   ★ これにより HANDOVER自動更新の失敗を **人間の監視なしに ARK 自身が起動時に検知** する。
+     cron #7 (2026-06-03) が5日間沈黙して気づかれなかった反省 (§4)。
+5. ヨーク 対話 開始
 
-★ 上記 1-3 を **省略 不可**、 完了後 でないと 仮説提案 NG
+★ 上記 1-4 を **省略 不可**、 完了後 でないと 仮説提案 NG
 
 ### 8.4 5 file 更新メカニズム
 
@@ -346,15 +383,16 @@ ARK は **ヨーク が「終わり」 と言うまで セッション継続**:
 [git push 自動]                    [Claude API 整理 (検証あり時)]
                                      |
                                      | HANDOVER + FAILURE_LOG 自動更新
+                                     | + cron_status.json 記録 (成否)
                                      v
                                   [push_to_mirror.py]
                                      |
                                      v
                                   [public mirror (project-cfs-output)]
                                      |
-                                     | web_fetch
+                                     | web_fetch (HANDOVER/FAILURE_LOG/cron_status)
                                      v
-                                  [次セッション ARK が 起動時取得]
+                                  [次セッション ARK が 起動時取得 + cron健全性 自己検知]
 ```
 
 ### 9.2 ARK の情報取得 (新セッション 起動時)
@@ -370,9 +408,12 @@ ARK 起動
   +-- 手順 強制実行
         └── web_fetch
               ├── HANDOVER_LATEST.md (最新)
-              └── FAILURE_LOG.md (最新)
+              ├── FAILURE_LOG.md (最新)
+              └── ml_output/cron_status.json (★ v2.3 cron健全性 自己検知)
+                    ├── result=success → 検証続行
+                    └── result=failed or 連続失敗 → cron修理を最優先 (§4, §8.3-4)
 
-= 5 file 完全把握 → 仮説提案 可能
+= 5 file + cron_status 完全把握 → 仮説提案 可能
 ```
 
 ### 9.3 1 検証 サイクル
@@ -392,11 +433,11 @@ ARK 起動
    ↓ watcher 30 秒
 [7. git push (HANDOVER)]
    ↓ (23:59 待機)
-[8. cron 自動] 当日集約 → Claude API 整理
+[8. cron 自動] 当日集約 → Claude API 整理 → cron_status 記録
    ↓
-[9. HANDOVER + FAILURE_LOG 統合更新 → mirror push]
+[9. HANDOVER + FAILURE_LOG 統合更新 → mirror push (cron_status 含む)]
    ↓
-[10. 翌日 ARK 起動] mirror から最新取得 → 即戦力
+[10. 翌日 ARK 起動] mirror から最新取得 + cron健全性 自己検知 → 即戦力
 ```
 
 ---
@@ -416,6 +457,8 @@ ARK 起動
 | cmd 連結 で 1 行 出力 (ヨーク 改行漏れリスク) | 親切心 不足 | 「ヨーク 環境配慮」 違反 |
 | 「全文 or 差分?」「GO か修正?」 と聞く | 自分で判断可能を確認 | §6.3 + §6.4 違反 (媚び) |
 | 「後で対応」「次セッションで」 | 先送り = 永久未実施 | 原則 1 違反 (自己保身) |
+| 実ファイル未確認で log だけで推定診断・修正 | 段階推定 | F-040 違反 (前任ARK 2026-06-03 自認) |
+| system失敗を検知する仕組みを作らず人間頼み | 沈黙する失敗を放置 | cron#7 5日沈黙の反省 (§4, §8.3) |
 
 ### 10.2 ARK 出力 OK パターン
 
@@ -425,6 +468,7 @@ ARK 起動
 - file 渡す時 = 最初から 完全 flow (DL → 配置 → cmd → 確認 まで)
 - 1 cmd ずつ 改行 で出力 (ヨーク 反射操作 で 連結 しない様)
 - 固定 file 更新 = **全文** 出力 + 「上書き保存して」 の 1 回指示
+- system修正前に実ファイルを確認 (推定診断NG、§11.9 + F-040)
 
 ### 10.3 ヨーク 指示 解釈
 
@@ -567,7 +611,7 @@ fin = load_financial()              # code4, date のみ (財務値は読まな�
 # code4 両方 str、 date 両方 datetime → merge 整合 OK
 ```
 
-### 11.6 universe filter 標準 (★ v2.2 訂正)
+### 11.6 universe filter 標準 (★ v2.2 訂正 / v2.3 拡張BLACKLIST)
 
 ```python
 # 物理コスト + universe filter (CFS_RULES §2 準拠)
@@ -577,6 +621,9 @@ BASE_SPREAD = 0.0005; SLIP_CAP = 0.10
 ORIGINAL_BLACKLIST = {1689, 6731, 2593, 9434, 5076, 2164, 5074,
                       7172, 9264, 9318, 6628, 2553, 2629, 8256}
 KNOWN_ETF = {1321, 1330, 1320, 1306, 1308, 1305}
+# ★ v2.3: cfs21 価格異常検出で33銘柄に拡張。clean_blacklist.csv ('code'列) を読込
+#   bl = set(pd.read_csv(r"...\data_clean_check\clean_blacklist.csv")['code'].astype(int))
+#   既存scriptは ORIGINAL_BLACKLIST にこのファイルがあれば統合する慣例 (phase_v3系参照)
 # ★ code4 が str のため EXCLUDE も str 集合化
 EXCLUDE_STR = {str(c) for c in (ORIGINAL_BLACKLIST | KNOWN_ETF)}
 
@@ -625,6 +672,8 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
 
 - ★ nrows=5 だけの確認は NG (旧 data 範囲が数字のみで int64 と誤判定する。 5/29 前任の事故)
 - 必ず **全範囲** + **英字混入 check** を実施してから script を書く
+- ★ system file (handover_runner.py, *.yml 等) を修正する時も同様: 実ファイルを確認してから直す
+  (log だけで推定診断・修正は F-040 違反。 前任ARK 2026-06-03 自認、 §10.1)
 
 ---
 
@@ -652,3 +701,9 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
   - §11.9 確認 cmd = nrows=5 → 全範囲 dtype + 英字混入 check (5/29 誤判定の再発防止)
   - §3 cache 構造コメント / §6.3 ヨーク操作範囲 / §6.4 確認頻度規律 / §10.1 NG パターン追加
   - 実証: str 統一で financial×price マッチ **81,707 件** 成立
+- 2026-06-03 v2.3 ★ cron #7 失敗対応 + 自己検知ループ (後任 ARK)
+  - cron #7 真原因: max_tokens=8000 到達で出力途中切れ → JSON末尾欠落 → parse失敗 (HANDOVER肥大化が背景)
+  - handover_runner.py: max_tokens 8000→16000 / bracket-counting parse + 末尾補完 / 圧縮ルール強制 (§4, §5)
+  - ★自己検知ループ: cron_status.json 記録 (成否・連続失敗) + self-check + yml `if:always()` status push
+    + push_to_mirror 同期対象追加 + §8.3-4 起動時 cron健全性確認。人間の監視なしにARKがcron失敗を自己検知
+  - §3 拡張BLACKLIST33 (cfs21) / §11.6 clean_blacklist.csv / §10.1-2 実ファイル未確認推定NG / §11.9 system file確認
