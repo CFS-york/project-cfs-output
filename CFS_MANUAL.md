@@ -14,7 +14,8 @@ C:\mnt\data\
 │   ├── ARK_DISCIPLINE.md
 │   ├── CFS_MANUAL.md (本ファイル)
 │   ├── FAILURE_LOG.md
-│   ├── HANDOVER_LATEST.md
+│   ├── HANDOVER_LATEST.md (圧縮active版)
+│   ├── HANDOVER_FULL.md (★全履歴版、cron機械追記)
 │   └── SETUP_PHASE1.md
 │
 ├── ファイル\         ★ 旧 11 file (アーカイブ、 触らない)
@@ -161,6 +162,14 @@ financial_cache.csv  # 列 19 個、 code4(object/str)、 date=発表日
 - self-check: 出力HANDOVERが参照用に足るか実行直後に診断 (サイズ・必須keyword)。情報欠落の疑いなら
   既存HANDOVERを上書きせず保持 (壊さない)。
 
+#### ★ v2.4 HANDOVER 2ファイル分離 (2026-06-03)
+cronと対話更新(ARK全文上書き)が HANDOVER_LATEST.md を奪い合う構造問題を解決:
+- **HANDOVER_LATEST.md** = cron が圧縮維持する active参照版(16KB目安、起動時必読、常にコンパクト)
+- **HANDOVER_FULL.md** = 全履歴版(圧縮せず時系列蓄積)。handover_runner が当日分(日時+summary+today_results)を
+  機械的に先頭追記(LLM出力非依存=堅牢、失敗しない)。LATESTがcron圧縮で詳細を失っても全履歴がここに残る。
+- 後任ARKは起動時 LATEST を読み、詳細が必要な時のみ FULL を web_fetch する(§8.3)。
+- 両方 mirror に同期される(push_to_mirror)。これでヨークの「どちらも残す」要件を満たす。
+
 #### cron_status.json の構造
 ```json
 {
@@ -200,7 +209,8 @@ ARK 用 query (TOP、 filter、 summary)
 
 ### handover_runner.py
 cron から 呼ばれる、 Claude API で HANDOVER 整理。
-★ v2.3: max_tokens 16000 / bracket-counting parse / 圧縮ルール強制 / cron_status 記録 + self-check (§4)
+★ v2.3: max_tokens 16000 / マーカー区切りparse(JSON廃止) / 圧縮ルール強制 / cron_status 記録 + self-check (§4)
+★ v2.4: HANDOVER_FULL.md に当日分を機械的に先頭追記(2ファイル分離、圧縮しない全履歴版)
 
 ### physics_validator.py
 scripts を Claude API で 物理整合 check
@@ -208,6 +218,7 @@ scripts を Claude API で 物理整合 check
 ### push_to_mirror.py
 ml_output + ファイル2 を public mirror へ同期。
 ★ v2.3: cron_status.json を同期対象に追加 (自己検知ループ)
+★ v2.4: HANDOVER_FULL.md を同期対象に追加 (2ファイル分離の全履歴版)
 
 ---
 
@@ -216,7 +227,7 @@ ml_output + ファイル2 を public mirror へ同期。
 | データ | 保管 | 理由 |
 |---|---|---|
 | 引継ぎ 5 file 固定 (Rules、 Discipline、 Manual) | PC + GitHub + **Project** | Project は ARK 起動時 自動読込 |
-| 引継ぎ 動的 file (HANDOVER、 FAILURE_LOG) | PC + GitHub + **public mirror** | mirror から ARK web_fetch 取得 |
+| 引継ぎ 動的 file (HANDOVER_LATEST圧縮版、 HANDOVER_FULL全履歴版、 FAILURE_LOG) | PC + GitHub + **public mirror** | mirror から ARK web_fetch 取得 |
 | 検証結果 軽量 | PC + GitHub private + mirror | 自動同期 |
 | 検証結果 大型 (>100MB) | PC のみ | GitHub 制限、 学習対象外 |
 | 旧体制 サマリ | mirror | 失敗パターン参照 |
@@ -293,9 +304,14 @@ ml_output + ファイル2 を public mirror へ同期。
    - cron_status.json が取得できない (404等) → mirror同期が止まっている疑い。ヨークに確認。
    ★ これにより HANDOVER自動更新の失敗を **人間の監視なしに ARK 自身が起動時に検知** する。
      cron #7 (2026-06-03) が5日間沈黙して気づかれなかった反省 (§4)。
-5. ヨーク 対話 開始
+5. ★ **HANDOVER詳細が必要な時 (v2.4 2ファイル分離)**: LATEST は圧縮active版。過去の検証詳細や
+   経緯を深く遡りたい時は、全履歴版を web_fetch:
+   - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/HANDOVER_FULL.md
+   (起動時必読ではない。LATESTで足りる時は読まなくてよい。詳細が要る時の参照先)
+6. ヨーク 対話 開始
 
-★ 上記 1-4 を **省略 不可**、 完了後 でないと 仮説提案 NG
+★ 上記 1-4 を **省略 不可**、 完了後 でないと 仮説提案 NG (5 は必要時のみ)
+★ web_fetch が古いキャッシュを返す事がある(raw.githubusercontent.com)。最新確認は urllib 直叩き推奨
 
 ### 8.4 5 file 更新メカニズム
 
@@ -407,11 +423,12 @@ ARK 起動
   |
   +-- 手順 強制実行
         └── web_fetch
-              ├── HANDOVER_LATEST.md (最新)
+              ├── HANDOVER_LATEST.md (圧縮active版、必読)
               ├── FAILURE_LOG.md (最新)
-              └── ml_output/cron_status.json (★ v2.3 cron健全性 自己検知)
-                    ├── result=success → 検証続行
-                    └── result=failed or 連続失敗 → cron修理を最優先 (§4, §8.3-4)
+              ├── ml_output/cron_status.json (★ v2.3 cron健全性 自己検知)
+              │     ├── result=success → 検証続行
+              │     └── result=failed or 連続失敗 → cron修理を最優先 (§4, §8.3-4)
+              └── HANDOVER_FULL.md (★ v2.4 全履歴版、詳細が要る時のみ)
 
 = 5 file + cron_status 完全把握 → 仮説提案 可能
 ```
@@ -701,6 +718,13 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
   - §11.9 確認 cmd = nrows=5 → 全範囲 dtype + 英字混入 check (5/29 誤判定の再発防止)
   - §3 cache 構造コメント / §6.3 ヨーク操作範囲 / §6.4 確認頻度規律 / §10.1 NG パターン追加
   - 実証: str 統一で financial×price マッチ **81,707 件** 成立
+- 2026-06-03 v2.4 HANDOVER 2ファイル分離 (後任ARK)
+  - 構造問題: cron圧縮 と ARK全文上書き が HANDOVER_LATEST.md を奪い合う(片方が片方を消す)
+  - 解決: HANDOVER_LATEST(cron圧縮active版,起動時必読) + HANDOVER_FULL(全履歴版,圧縮せず時系列蓄積)
+  - handover_runner が FULL に当日分を機械追記(LLM非依存=堅牢)。push_to_mirror/auto_handover.yml も同期対象追加
+  - 8.3 起動手順に「詳細はFULLをweb_fetch」step追加。4/5/9.2/6 反映
+  - web_fetchキャッシュ注意(raw.githubusercontentは数分古い版を返す事あり、最新確認はurllib直叩き)
+  - 動作確認済(cron #11でFULL生成・mirror同期確認)
 - 2026-06-03 v2.3 ★ cron #7 失敗対応 + 自己検知ループ (後任 ARK)
   - cron #7 真原因: max_tokens=8000 到達で出力途中切れ → JSON末尾欠落 → parse失敗 (HANDOVER肥大化が背景)
   - handover_runner.py: max_tokens 8000→16000 / bracket-counting parse + 末尾補完 / 圧縮ルール強制 (§4, §5)
