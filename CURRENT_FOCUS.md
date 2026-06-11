@@ -22,17 +22,6 @@ git clone --depth 1 https://github.com/CFS-york/project-cfs-output.git で実体
 
 ================================================================
 
-## ★参照すべきデータ・場所の地図(記憶でなくここを見る。後任が迷わないために)
-- 原資データセット: C:\mnt\data\Results\ARK\cfs5\cfs148_dataset\dataset.parquet (約452MB, .gitignoreでローカルのみ。列=t,code,price系_pct(28特徴),netfix,top1)
-- cache(削除禁止): C:\mnt\data\cache\ (adjc_cache_54m / adjo_cache_54m / adjh / adjl / vol。date(str),code4(★str),値(float64))
-- 確証済み実装: C:\mnt\data\scripts\cfs_common.py (load_base/net_of/engines/base_ML/sim_equal_weight)
-- ガード: C:\mnt\data\ark_guard.py (run.py組込済。横着を実行拒否)
-- 実行: cd C:\mnt\data; python run.py scripts\(name).py (自動でprivate push、引継ぎ系編集はmirror同期)
-- 結果出力: C:\mnt\data\Results\ARK\cfs5\cfsXXX_*\ (csv+summary.md) と ファイル2\cfsXXX_*.md(mirror同期)
-- 規約・引継ぎの同期元: C:\mnt\data\ファイル2\ (CFS_RULES/CFS_MANUAL/ARK_DISCIPLINE/FAILURE_LOG/HANDOVER_LATEST/CURRENT_FOCUS)
-- public mirror(後任のGitHub参照先, .mdのみ): github.com/CFS-york/project-cfs-output (git cloneで読む)
-- private repo(全ファイル): github.com/CFS-york/project-cfs
-
 # CURRENT_FOCUS — ARKの現在地(run.py が毎回表示 / 検証前に必ず読む)
 
 最終更新: 2026-06-10 (取り置き8個を整理統合。肥大化を畳んだ)
@@ -54,6 +43,34 @@ git clone --depth 1 https://github.com/CFS-york/project-cfs-output.git で実体
 - 地合い特徴(mret20_pctg/mvol_pctg)= adjc_cache_54mから毎回再計算しmerge必須。featに含める。欠落で結果崩壊(2.9x->0.97x)。
 - 評価軸 = 実約定複利(等加重・常時フルポジション)。平均log/勝率は幻。
 - cache列 = adjc/adjo_cache_54m: date(str),code4(★str),AdjC/AdjO(float64)。code4はstr統一(int不可)。
+
+## ★cfs_common の使い方(後任がmirrorを読むだけで呼べるように)
+import: `import sys; sys.path.insert(0, r"C:\mnt\data\scripts"); import cfs_common as C`
+```python
+# 1) 原資読込(地合いmerge込み。手で書かない)
+B = C.load_base(DATA, CACHE, CLEAN, with_jiai=True)
+#   DATA=r"C:\mnt\data\Results\ARK\cfs5\cfs148_dataset\dataset.parquet"
+#   CACHE=r"C:\mnt\data\cache" ; CLEAN=r"C:\mnt\data\Results\ARK\cfs5\data_clean_check"
+#   返り値 B = {df, netfix, top1, t_arr, codes, X, feat}  (feat=price系_pct+地合い)
+t_arr=B['t_arr']; netfix=B['netfix']; codes=B['codes']; top1=B['top1']; X=B['X']
+
+# 2) 4エンジン学習(複利/大化け/左裾回避/神の目)
+eng = C.engines(X, trm, netfix, top1)          # trm=学習mask(bool配列, 例 t_arr<=sp)
+scd = {k:g.predict(X) for k,g in eng.items()}
+th  = {k:__import__('numpy').quantile(scd[k][trm],0.95) for k in eng}  # しきい値=学習quantile固定(look-ahead防止)
+
+# 3) 入口=複+大+左 のAND
+base = C.base_ML(scd, th)                        # bool配列(複利&大化け&左裾回避 各上位5%)
+
+# 4) 実約定複利sim(常時フルポジ等加重daily_max5。検証済み)
+m327,ntr,wr,gr,dd = C.sim_equal_weight(base & tem, t_arr, netfix, codes, top1, scd['神の目'], M=1)
+#   tem=検証mask(t_arr>sp)。M=同銘柄最大玉数(1=乗り続けなし)。
+#   返り値 = (16m倍率, 約定数, 勝率, 神の目率, 最大DD)
+```
+定数(C.COST/TAX/BASE_SPREAD/INIT/K=30/HOLD=13/MIN_PER/DAILY_MAX=5)もcfs_commonにある。
+★cfs_common/ark_guard/各cfsXXX.pyのソースはmirror(.mdのみ)に無い。中身を読みたい時はヨークにアップロードを依頼するか private repo(github.com/CFS-york/project-cfs)を参照。
+
+
 
 ## 絶対原則
 神の目を物差しに。神の目=未来netの上位を選別。その買い目と決済を解剖し手法化するのが本筋。
