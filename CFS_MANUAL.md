@@ -5,13 +5,13 @@ ARK が script 書く時、 ヨーク が cmd 叩く時、 ARK が起動する�
 
 ---
 
-## 1. ディレクトリ構造 (2026-06-11 整理後)
+## 1. ディレクトリ構造 (2026-06-12 ARK_LOOP 反映)
 
 ```
 C:\mnt\data\
 ├── ファイル2\        ★ 引継ぎ system file (active 11 file)
 │   ├── CFS_RULES.md
-│   ├── ARK_DISCIPLINE.md
+│   ├── ARK_DISCIPLINE.md (v1.6、 F-050 追加)
 │   ├── CFS_MANUAL.md (本ファイル)
 │   ├── HANDOVER_LATEST.md (圧縮 active 版)
 │   ├── HANDOVER_FULL.md (★全履歴版、 cron 機械追記)
@@ -26,8 +26,9 @@ C:\mnt\data\
 ├── ファイル\         ★ 旧 11 file (アーカイブ、 触らない)
 │
 ├── scripts\          ★ 検証 script
-│   ├── cfs_common.py (確証済み実装 単一 source、 load_base/engines/base_ML/sim_equal_weight)
-│   └── ark_guard.py (横着実行拒否 / 警告化未着手 = 次セッション ARK 任務)
+│   └── cfs_common.py (確証済み実装 単一 source、 load_base/engines/base_ML/sim_equal_weight)
+│
+├── ark_guard.py      ★ v3 (横着検知 + 確定クラッシュ/棄却軸再演 STOP、 2026-06-12。 実体は repo 直下)
 │
 ├── ml\               ★ 機械学習 + 自動化 system
 │   ├── auto_push_watcher.py (v2.4 encoding 修正済)
@@ -35,7 +36,9 @@ C:\mnt\data\
 │   ├── ingest.py、 learn.py、 query.py、 run_pipeline.py、 auto_pipeline.py、 expand_axes.py
 │   ├── collect_today_results.py、 handover_runner.py (6/03 マーカー区切り版、 max_tokens 16000)
 │   ├── physics_validator.py、 push_to_mirror.py (v3 token mask、 2026-06-11)
-│   └── ingest_v5_legacy_summary.py
+│   ├── ingest_v5_legacy_summary.py
+│   ├── failure_keywords.json   ★ 2026-06-12 新設 (棄却軸検知 token、 ark_guard v3 STOP-B が参照)
+│   └── session_state.json      ★ 2026-06-12 新設 (run.py v3 自動生成: run_count/strikes/rotate。 手動編集不要)
 │
 ├── ml_input\、 ml_output\
 │   └── cron_status.json (★ 自己検知ループ、 2026-06-03 追加)
@@ -48,8 +51,7 @@ C:\mnt\data\
 │   ├── auto_handover.yml (cron 23:59、 6/03 復旧版)
 │   └── physics_check.yml
 │
-└── run.py            ★ 検証実行 + auto pipeline trigger
-                       (ark_guard 組込済、 ARK_PHILOSOPHY 表示、 2026-06-11)
+└── run.py            ★ v3 (検証実行 + ARK_LOOP M1/M3/M4 + selftest/newchat、 2026-06-12)
 ```
 
 ---
@@ -64,10 +66,21 @@ python run.py scripts\xxx.py
 ```
 
 自動進行:
-1. 検証 script 実行
-2. ingest.py 自動 trigger (trial 集約)
-3. learn.py 自動 trigger (LightGBM 学習)
-4. git add + commit + push
+1. ARK_LOOP 関門 (M1 SESSION_GATE / M3 PROBE 照合 / PREFLIGHT / ark_guard)
+2. 検証 script 実行
+3. ingest.py 自動 trigger (trial 集約)
+4. learn.py 自動 trigger (LightGBM 学習)
+5. git add + commit + push
+6. footer に [ARK_LOOP] run_count/strikes + [ARK_PROBE] 2 問 印字
+
+### ★ ARK_LOOP subcommand (2026-06-12 新設)
+
+```powershell
+python run.py newchat    # 新 chat 開始時に 1 回 (state reset、 次 script に ARK_SESSION_CHECK 必須化)
+python run.py selftest   # 機構の機械受入テスト T1-T4 (改修時の健全性確認)
+```
+
+- [ARK_ROTATE] が画面に出たら: ①現 chat ARK に HANDOVER 全文更新を出させ上書き保存 → ②新 chat 起動 + `python run.py newchat`。 newchat まで run.py は検証実行を拒否する
 
 ### 結果 確認
 
@@ -129,6 +142,7 @@ financial_cache.csv  # 列 19 個、 code4(object/str)、 date=発表日
 - price cache: code4 = **str** (英字コード `132A` 等 2024+ 東証新体系を含むため int 化不可)
 - financial_cache: code4 = **object/str**
 - 両側 **str 統一** が正解 (§11.4 参照)。 int 統一は英字銘柄を捨て universe を歪曲 + ValueError
+- ★ v2.6: ark_guard v3 STOP-A が `dtype={'code4': int}` を実行前に検知し STOP する (2026-06-12 cfs140 で int 読込クラッシュ実証後の物理ガード化)
 
 ### docstring 必須
 
@@ -146,15 +160,34 @@ ARK_PREFLIGHT = {
 }
 ```
 
-無いと ark_guard が実行拒否 (現状) または警告 (今後 修正予定、 ★ v2.5 後任 ARK 任務)。
+無いと run.py の F-043 関門 で 実行拒否。
+
+### ★ ARK_LOOP header (v2.6、 2026-06-12 新設、 run.py v3 が機械照合)
+
+| header | いつ必須 | 内容 | 不備時 |
+|---|---|---|---|
+| `ARK_SESSION_CHECK:` | newchat 後の **最初の** script | 公式現在地 mult / 最優先タスク / 直近棄却 を 1 行で。 HANDOVER 真値と文字列照合 | **実行拒否** + 該当 section 印字 (M1) |
+| `ARK_PROBE_ANS:` | **毎** script | Q1 公式 mult、 Q2 最優先タスク (前 run footer の probe への回答) | strike +1、 2 strike で [ARK_ROTATE] (M3) |
+| `ARK_BLOCK:` | **毎** script (CFS_MAP に検証地図がある間) | 地図のどの Block (B0, B1, ...) に属するか 1 行で。 地図に無い Block = **実行拒否** (M5)。 Block を変える時は先に CFS_MAP 検証地図を全文更新 | **実行拒否** + 地図印字 (M5、 v3.1) |
+| `ARK_FAILURELOG_DIFF:` | 棄却軸 token (ml/failure_keywords.json) を script が含む時 | 棄却された形と本件の差分 1-3 行 | **STOP** (ark_guard v3 STOP-B)。 書けない = 同じ軸の再演 = 中止が正 |
 
 ---
 
 ## 4. 自動化 system
 
-### run.py
+### run.py (★ v3、 2026-06-12 = ARK_LOOP)
 ヨーク が叩く cmd 1 個 の core。 検証 + ingest + learn + push 連鎖。
-ark_guard 組込済 (横着 script を停止)。 ARK_PHILOSOPHY 表示 (起動時 規律 visibility)。
+
+背景: 後任 ARK 崩壊 3 層 (①読んだ≠理解した ②記憶+場当たり ③文脈累積で言語崩壊) + ヨーク指摘 「自己分析はできるが実行されない、 それすら失念する = 規律 file 強化では構造的に解決しない」。 → **ARK の意志・誠実さに依存する判定をゼロにし、 全て文字列照合に置換** (selftest T1-T4 ALL PASS で強制力を機械証明、 2026-06-12)。
+
+- 機構1 (M4): ARK_PHILOSOPHY + HANDOVER §1 現在地 + ★CFS_MAP 「今の検証テーマ」 を毎 run 強制表示
+- 機構2: ARK_PREFLIGHT 無し = 実行拒否
+- 機構3: 禁止ワード ドリフト警告
+- ★機構4 (M1 SESSION_GATE): newchat 後の初 script に ARK_SESSION_CHECK 必須。 HANDOVER から正規表現で真値 (公式 mult / §3 最優先 / §4 直近棄却) を機械抽出し照合。 不一致 = 実行拒否 (層① 対策)
+- ★機構5 (M3 PROBE LOOP): 毎 run footer に probe 2 問印字 → 次 script の ARK_PROBE_ANS を機械照合。 誤答 = strike。 **2 strike or 25 run で [ARK_ROTATE]** = chat 強制交代、 以後 newchat まで実行拒否 (層③ 対策。 chat 切替が ARK 自発提案でもヨーク監視でもなく機械判定になった)
+- ★機構6 (M5 BLOCK_GATE v2、 v3.2、 2026-06-12): CFS_MAP 「検証地図」 = **1 仮説 1 Block** (ヨーク設計)。 仮説は 「●●を○○することで△△を狙う」 の文で立て、 Block 内のリアクション検証は自由、 **Block は必ず総括で閉じる**。 active は常に 1 つで、 script が走るのは active Block のみ。 Block 遷移 = 旧 Block に総括 + status: done → 新 Block を active (CFS_MAP 全文更新) が物理的に必須 = 「②の中で目先に流されて①を見失う」 を総括の強制で断つ。 検証地図は毎 run 再注入
+- state は ml/session_state.json (自動生成・自動更新、 手動編集不要)
+- 残存穴 (設計時明記): script を伴わない純対話 turn は関門を通らない。 M3 周期 + 寿命上限で有界化、 最後の網はヨークの 「GATE は?」
 
 ### watcher (auto_push_watcher.py、 v2.4)
 
@@ -245,6 +278,31 @@ ml_output + ファイル2 を public mirror へ同期。
 ★ v2.4: HANDOVER_FULL.md を同期対象に追加 (2 ファイル分離の全履歴版)
 ★ v3 (2026-06-11): token mask 化 (run() で push_url の token を `<TOKEN_MASKED>` に置換、 流出防止)
 
+### ark_guard.py (★ v3、 2026-06-12 = ARK_LOOP M2)
+
+run.py が script 実行前に check_script(path) を呼ぶ。 v2 WARN 裁定 (ヨーク 「cmd 1 個」 設計) は維持しつつ、 **mode 非依存の STOP 2 種** を新設:
+
+- **STOP-A**: cache csv を `dtype={'code4': int}` で読込 = '132A' 等英字コードで ValueError **確定クラッシュ** (2026-06-12 cfs140 で実証)。 止める方が run 1 回ぶん速い。 修正 = dtype str の 1 点
+- **STOP-B**: `ml/failure_keywords.json` の棄却軸 token を含み `ARK_FAILURELOG_DIFF` 宣言なし。 「これ前試した」 照合を ARK の記憶からファイル grep に移管 (F-046)。 解消コスト = header 1-3 行。 本当に同じ軸なら書けない = 正しく止まる
+- 既存 3 check (read_parquet 生読み / sim 独自定義 / net_of 再定義) は v2 どおり WARN default
+- selftest 用に `scan_text(src)` を公開 ((stops, warns) を返す)
+- failure_keywords.json の更新: 棄却確定の度に **ARK が全文更新** → ヨーク上書き (F-050)。 将来 cron 自動更新化候補
+
+#### 動作モード
+
+| モード | 環境変数 | 動作 | 用途 |
+|---|---|---|---|
+| WARN (default) | (なし) | 旧 3 check 警告 + 続行。 ★STOP-A/B は常時 STOP | 通常 検証 |
+| STRICT | `ARK_GUARD_STRICT=1` | 旧 3 check も STOP | cron 自動検証 |
+| BYPASS | `ARK_GUARD_BYPASS=1` | 全 check skip (STOP-A/B 含む) | 緊急 override (ヨーク 自己責任) |
+
+ヨーク 操作例:
+```powershell
+$env:ARK_GUARD_STRICT=1; python run.py scripts\xxx.py    # STRICT
+$env:ARK_GUARD_BYPASS=1; python run.py scripts\xxx.py    # BYPASS (緊急)
+Remove-Item Env:ARK_GUARD_STRICT                          # default に戻す
+```
+
 ### cfs_common.py (★ 2026-06-04+ 後任 ARK 整備)
 確証済み実装の単一 source。 確証済み関数:
 - `load_base(DATA, CACHE, CLEAN, with_jiai=True)`: 原資読込 + 地合い merge
@@ -271,6 +329,7 @@ ml_output + ファイル2 を public mirror へ同期。
 | 検証結果 大型 (>100MB) | PC のみ | GitHub 制限、 学習対象外 |
 | 旧体制 サマリ | mirror | 失敗パターン参照 |
 | cache | PC のみ | J-Quants 再取得可 |
+| ARK_LOOP 構成 (run.py v3 / ark_guard v3 / failure_keywords.json / session_state.json) | PC + GitHub private | run.py 連鎖 push で自動同期 (2026-06-12) |
 
 ### 6.3 ヨーク 操作 範囲 (★ 重要)
 
@@ -292,6 +351,7 @@ ml_output + ファイル2 を public mirror へ同期。
 ## 7. ヨーク 設定 (1 回 のみ、 完了済)
 
 詳細 は SETUP_PHASE1.md 参照。
+★ 2026-06-12 追加の恒常操作: 新 chat 開始時のみ `python run.py newchat` 1 cmd (ARK_LOOP M1 起動)。
 
 ---
 
@@ -305,12 +365,13 @@ ml_output + ファイル2 を public mirror へ同期。
 - 検証結果 分析
 - ヨーク に進捗 報告
 - 規律 (ARK_DISCIPLINE) 遵守
+- ★ file 追加 / system 変更 と同 turn での文書更新 全文出力 (F-050、 2026-06-12)
 
 **やらない事**:
 - 検証 実行 (= ヨーク 役割)
 - 大方針 単独判断 (= ヨーク 役割)
 - 規律 変更 (= ヨーク 単独判断)
-- セッション終了 提案 (= ヨーク 指示 まで継続)
+- セッション終了 提案 (= ヨーク 指示 まで継続。 ★ chat 交代は run.py v3 [ARK_ROTATE] の機械判定に移管)
 - file 直接編集 (= ヨーク 経由)
 
 ### 8.2 ヨーク の役割
@@ -321,31 +382,35 @@ ml_output + ファイル2 を public mirror へ同期。
 - ARK 規律違反 指摘
 - 絶対ルール 単独判断
 - ARK の暴走 ストップ
+- ★ 新 chat 開始時の `python run.py newchat` (2026-06-12)
 
 **やらない事**:
 - ARK が やるべき 思考代行
 - 物理仕様 / 規律 を ARK が無視 する事 を 黙認
 - file の手作業編集 (上書き保存のみ、 §6.3)
 
-### 8.3 新セッション 起動時 必須手順 (Project 「手順」 に設定済、 ★ v2.5 強化)
+### 8.3 新セッション 起動時 必須手順 (起動 prompt に設定済、 ★ v2.6.1 mirror 単一正本化)
 
-1. Project files (CFS_RULES、 ARK_DISCIPLINE、 CFS_MANUAL) 自動読込
-2. **web_fetch で 以下 取得**:
+★ **v2.6.1 (2026-06-12)**: Project files 差し替え運用は **廃止**。 claude.ai Project files は PC から書き込む API が無く人間の画面操作でしか更新できない = 放置で stale 化する。 起動 prompt が 9 file 全部を mirror から fetch する現運用では冗長。 **正本 = mirror**。 Project files が残っていても参考扱い (版が古い可能性あり、 mirror 取得分を優先)。
+
+1. **web_fetch で 以下 9 file を取得 (起動 prompt 設定済)**:
+   - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS_RULES.md
+   - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/ARK_DISCIPLINE.md
+   - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS_MANUAL.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/HANDOVER_LATEST.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/FAILURE_LOG.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS_MAP.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS_DIRECTION.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/ARK_PHILOSOPHY.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/P1_DEFINITION.md
-3. 計 9 file (Project 3 + web_fetch 6) を 統合 認識
+2. 計 9 file を 統合 認識
 4. ★ **cron 健全性 自己検知 (v2.3 追加)**: web_fetch で
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/ml_output/cron_status.json
    を取得し確認:
    - `result == "failed"` または `consecutive_failures >= 1` → **cron が壊れている**。 仮説提案より先に診断・修理 (§4 参照)
-   - `last_success` が 数日以上前 → cron が動いていない疑い。 同上
+   - `last_success` が 数日以上前 → cron が動いていない疑い。 ★ ただし skip 連続でも日付は古くなる (2026-06-12 確認)。 日付だけで異常と断定せず HANDOVER §1 system 状況と照合
    - `result == "success"` かつ consecutive_failures == 0 → 正常、 検証続行
    - cron_status.json が取得できない (404 等) → mirror 同期が止まっている疑い。 ヨークに確認
-   ★ これにより HANDOVER 自動更新の失敗を **人間の監視なしに ARK 自身が起動時に検知** する
 5. ★ **HANDOVER 詳細が必要な時 (v2.4 2 ファイル分離)**: LATEST は圧縮 active 版。 過去の検証詳細や経緯を深く遡りたい時のみ:
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/HANDOVER_FULL.md
 6. ★ **起動時 自己テスト (v2.5、 2026-06-11)、 仮説提案 着手前 に必須**: 以下 4 問 を即答できる か:
@@ -355,6 +420,7 @@ ml_output + ファイル2 を public mirror へ同期。
    4. 次セッション の最重要タスク 1 件 は? (HANDOVER_LATEST §3)
    - 即答可 = 「理解した」 状態、 仮説提案 着手 OK
    - 即答不可 = 「読んだだけ」 状態 (F-047 違反)、 該当 file 再読 強制
+   - ★ (v2.6) この自己テストは run.py v3 M1 SESSION_GATE で機械照合される。 newchat 後の最初の script に ARK_SESSION_CHECK 必須 (§3 参照)
 7. ヨーク 対話 開始
 
 ★ 上記 1-6 を **省略 不可**、 完了後 でないと 仮説提案 NG
@@ -364,10 +430,12 @@ ml_output + ファイル2 を public mirror へ同期。
 
 | file | 自動 / 手動 | 更新 trigger | 更新 主体 |
 |---|---|---|---|
-| HANDOVER_LATEST.md | 完全自動 + 手動更新 | cron 23:59 + ARK 大進展時 | Claude API / ARK |
+| HANDOVER_LATEST.md | 完全自動 + 手動更新 | cron 23:59 + ARK 大進展時 | Claude API / ARK 全文 |
 | HANDOVER_FULL.md | 完全自動 | cron 23:59 (機械追記) | handover_runner |
 | FAILURE_LOG.md | 完全自動 | cron 23:59 (失敗確定時) | Claude API |
 | cron_status.json | 完全自動 | cron 毎回 | handover_runner |
+| session_state.json | 完全自動 | run.py 毎回 + newchat | run.py v3 |
+| failure_keywords.json | 手動 | 棄却軸 確定時 | ARK 全文提案 → ヨーク 上書き保存 |
 | CFS_RULES.md | 手動 | 絶対ルール変更 | ヨーク 単独 |
 | ARK_DISCIPLINE.md | 手動 | 新規律 確定 | ARK 提案 → ヨーク 承認 |
 | CFS_MANUAL.md | 手動 | system 変更 | ARK 全文提案 → ヨーク 上書き保存 |
@@ -378,32 +446,22 @@ ml_output + ファイル2 を public mirror へ同期。
 2. watcher v2.4 が 25 秒以内 に 自動 git push (private + mirror push)
 3. mirror 反映で 次セッション ARK が取得可能
 
-### 8.5 `[HANDOVER ADD]` タグ ルール (★ 重要)
+### 8.5 ★ HANDOVER 即時更新ルール (v2.6 改定: [HANDOVER ADD] 廃止 → 全文方式)
 
-ARK と ヨーク の chat 議論 は **API に渡らない** (claude.ai 内部 のみ)。
-重要発見 を HANDOVER に残す ため:
+ARK と ヨーク の chat 議論 は **API に渡らない** (claude.ai 内部 のみ)。 重要発見 を HANDOVER に残す ため、 ARK が更新を出す。
 
-#### ARK が出力 する形式
+★ **2026-06-12 改定 (ヨーク運用に整合)**: ヨークは file を手作業編集しない (§6.3)。 部分貼付けを求める [HANDOVER ADD] タグ形式は **廃止**。
 
-```
-[HANDOVER ADD]
-section: 確定事実  (or 次アクション、 検証ログ、 棄却済 等)
-内容:
-- 具体的内容 を 1-5 行 で
-- data 上 確認 した数値 込みで
-```
-
-#### ヨーク 操作
-
-ARK 出力 → ヨーク が `ファイル2\HANDOVER_LATEST.md` の該当 section 末尾 に 貼り付け → 保存。
-
-watcher が 25 秒以内 push → 翌日 23:59 cron で API が きれいに統合。
+#### 現行ルール
+- ARK が HANDOVER_LATEST.md の **全文** (該当 section に新情報を統合済) を出力 → ヨークが上書き保存
+- watcher が 25 秒以内 push → 翌日 23:59 cron で API が圧縮整理
 
 #### いつ出すか
-
 - 重要 確定事実 (新 mult 真値、 新 軸 importance 等)
-- 棄却 確定 (新 look-ahead 発見、 新 物理違反 等)
+- 棄却 確定 (新 look-ahead 発見、 新 物理違反 等。 failure_keywords.json の全文更新も同 turn で)
 - 次アクション 更新 (優先順 変更 等)
+- ★ file 追加 / system 変更 (F-050: 同 turn 必須)
+- ★ [ARK_ROTATE] が出た時 (chat 交代前の最終全文更新)
 
 ### 8.6 セッション 終了 規律
 
@@ -411,6 +469,7 @@ ARK は **ヨーク が「終わり」 と言うまで セッション継続**:
 - 自分から「終わりましょう」 NG
 - 「今日 のやる事 終わった、 次 どうしますか?」 で 待機 OK
 - ヨーク 怒り / 不満 表明 で 撤退 NG (代わり に 規律遵守 + 訂正)
+- ★ chat 交代 (≠ セッション終了 提案) は run.py v3 [ARK_ROTATE] の機械判定。 ARK は ROTATE 表示が出たら HANDOVER 全文更新を出して従う
 
 ---
 
@@ -424,7 +483,10 @@ ARK は **ヨーク が「終わり」 と言うまで セッション継続**:
   | 思考 + 提案                       | cmd 1 個
   | (議論、 規律、 仮説)               | run.py scripts\xxx.py
   v                                  v
-[ヨーク 判断]                       [検証 実行]
+[ヨーク 判断]                       [ARK_LOOP 関門 (M1/M3/PREFLIGHT/ark_guard v3)]
+                                     |
+                                     v
+                                  [検証 実行]
                                      |
                                      | git push 自動
                                      v
@@ -451,21 +513,20 @@ ARK は **ヨーク が「終わり」 と言うまで セッション継続**:
                                      |
                                      | web_fetch (9 file + cron_status)
                                      v
-                                  [次セッション ARK が 起動時取得 + 自己テスト 4 問]
+                                  [次セッション ARK が 起動時取得 + 自己テスト 4 問
+                                   + run.py newchat → M1 SESSION_GATE 機械照合]
 ```
 
 ### 9.2 ARK の情報取得 (新セッション 起動時、 v2.5)
 
 ```
-ARK 起動
+ARK 起動 (★ v2.6.1: mirror 単一正本、 Project files 差し替え運用 廃止)
   |
-  +-- Project files 自動読込
-  |     ├── CFS_RULES.md (絶対ルール)
-  |     ├── ARK_DISCIPLINE.md (規律 + F-046〜F-049 + FOCUS_GATE v2)
-  |     └── CFS_MANUAL.md (本ファイル、 運用)
-  |
-  +-- 手順 強制実行
-        └── web_fetch
+  +-- 起動 prompt 強制実行
+        └── web_fetch (mirror)
+              ├── CFS_RULES.md (絶対ルール)
+              ├── ARK_DISCIPLINE.md (規律 + F-046〜F-050 + FOCUS_GATE v2)
+              ├── CFS_MANUAL.md (本ファイル、 運用)
               ├── HANDOVER_LATEST.md (圧縮 active 版、必読)
               ├── FAILURE_LOG.md (最新)
               ├── CFS_MAP.md (大方針、 神の目=10x)
@@ -478,22 +539,23 @@ ARK 起動
               └── HANDOVER_FULL.md (★ v2.4 全履歴版、 詳細が要る時のみ)
 
 = 9 file + cron_status 完全把握 → 起動時 自己テスト 4 問 (v2.5) → 通過後 仮説提案 可能
+  (★ v2.6: ヨーク側 `python run.py newchat` 実行済なら、 最初の script で M1 機械照合)
 ```
 
 ### 9.3 1 検証 サイクル
 
 ```
-[1. ARK と ヨーク chat] 仮説議論 → script 設計
+[1. ARK と ヨーク chat] 仮説議論 → script 設計 (header: PREFLIGHT + PROBE_ANS (+SESSION_CHECK/DIFF))
    ↓
 [2. ヨーク] python run.py scripts\xxx.py
-   ↓ (自動 + ark_guard check)
-[3. 検証実行 → Results/ → ingest → learn → git push]
+   ↓ (自動 + ARK_LOOP M1/M3 照合 + ark_guard v3 check)
+[3. 検証実行 → Results/ → ingest → learn → git push → footer に PROBE + run_count]
    ↓
 [4. physics_check workflow] 物理整合 check
    ↓ 違反なし
-[5. ARK と ヨーク chat] 結果分析
-   ↓ ARK 出力: [HANDOVER ADD] タグ
-[6. ヨーク] HANDOVER_LATEST.md に 貼付け + 保存
+[5. ARK と ヨーク chat] 結果分析 (F-045 構造解剖)
+   ↓ 大進展 / 棄却確定 / file 追加 時: ARK が HANDOVER 全文出力 (§8.5)
+[6. ヨーク] HANDOVER_LATEST.md 上書き保存
    ↓ watcher 25 秒
 [7. git push (HANDOVER) + mirror 即時]
    ↓ (23:59 待機)
@@ -528,6 +590,7 @@ ARK 起動
 | **★ (v2.5) court 等 自動付加 token 連発 (言語崩壊)** | chat context 累積劣化 | F-048 違反 |
 | **★ (v2.5) 「ARK 単独 で全部 やる」 提案** | 同列 ARK 領域侵害 | F-049b 連動 |
 | **★ (v2.5) fetch しただけ で 「理解した」 状態 と誤認** | 起動時 自己テスト 省略 | F-047 違反 |
+| **★ (v2.6、 2026-06-12) file 追加 / system 変更 turn で文書更新を出さない** | 引継ぎ断絶 | F-050 違反 |
 
 ### 10.2 ARK 出力 OK パターン
 
@@ -541,6 +604,7 @@ ARK 起動
 - **★ (v2.5) 起動時 自己テスト 4 問 通過 後 仮説提案 着手**
 - **★ (v2.5) 既存 file の該当 section を 更新、 新設 file で二重化 しない**
 - **★ (v2.5) chat 横断不可 認識 + ヨーク 経由 差分情報取得 path**
+- **★ (v2.6) file 追加 / system 変更 と文書更新 全文 を同 turn で出す (F-050)**
 
 ### 10.3 ヨーク 指示 解釈
 
@@ -590,9 +654,10 @@ C:\mnt\data\cache\
 - date 形式: `'YYYY-MM-DD'` 文字列 (例: `'2021-04-02'`)
 - code4: **str** (例 `'1301'`、 及び `'132A'` 等の **英字混入コードが実在**)
   - 2024 年以降の東証コード体系で 4 桁目に英字を持つ銘柄があり **int64 化不可**
-  - `pd.read_csv(dtype={'code4': int})` は `ValueError: invalid literal for int() with base 10: '132A'` で停止
+  - `pd.read_csv(dtype={'code4': int})` は `ValueError: invalid literal for int() with base 10: '132A'` で停止 (2026-06-12 cfs140 で再実証)
   - dtype 未指定だと `mixed types` 警告 + object 型
 - ETF コード も str で含む (KNOWN_ETF で除外 推奨)
+- ★ v2.6: ark_guard v3 STOP-A が int 読込を実行前に物理検知する
 
 ### 11.3 financial_cache.csv 実構造
 
@@ -643,6 +708,7 @@ merged = pd.merge(price, fin, on='code4')         # 値の空白差等で不安�
 # NG②: int 統一は不可 (price 側 '132A' 等英字コードで停止)
 price = pd.read_csv('adjo_cache_54m.csv', dtype={'code4': int})
 #   → ValueError: invalid literal for int() with base 10: '132A'
+#   ★ v2.6: ark_guard v3 STOP-A がこのパターンを実行前に止める
 ```
 
 ```python
@@ -757,19 +823,27 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
 - 2026-06-02 v2.2 ★ code4 dtype 訂正 (後任 ARK 実検証で真因発見)、 str 統一
 - 2026-06-03 v2.3 ★ cron #7 失敗対応 + 自己検知ループ
 - 2026-06-03 v2.4 HANDOVER 2 ファイル分離
-- **2026-06-11 v2.5 前任 ARK 代行整理**:
-  - §1 ディレクトリ構造: active 11 file + archive\ 反映、 大方針 4 file (MAP/DIRECTION/PHILOSOPHY/P1_DEFINITION) 明示、 cfs_common/ark_guard 反映
-  - §3 ARK_PREFLIGHT 必須化 明示 (run.py の ark_guard が check)
-  - §4 自動化 system に push_to_mirror v3 token mask (2026-06-11) 反映
-  - §5 cfs_common.py + ark_guard.py の役割 明示
-  - §6.3 「ARK 単独 で全部 やる」 提案 NG 追加 (F-049 連動)
-  - §8.3 起動手順 v2.5: web_fetch 対象 6 file (HANDOVER/FAILURE + 大方針 4) + 起動時 自己テスト 4 問 必須化
-  - §8.4 引継ぎ file 更新メカニズム: 大方針 4 file + cron_status 追加
-  - §9.2 ARK 起動時 取得 9 file 反映
-  - §10.1 NG パターンに 6/11 違反 5 件 追加 (F-046〜F-049 連動): 二重化、 chat 横断不可、 court 連発、 ARK 単独全部、 fetch=理解 誤認
-  - §10.2 OK パターンに 6/11 追加 3 件: 自己テスト、 既存 file 更新、 chat 横断不可認識
-  - §10.3 ヨーク 指示解釈に追加: ストップ、 綿密、 マジで頼むぜ、 ポンコツ過ぎ
-  - §11.3 financial_cache に確証済み定義 (netfix、 規約 execution、 地合い特徴、 評価軸) 移植 (CURRENT_FOCUS から)
-  - §11.3 forecast_eps の注釈追加 (eps と異期可能性、 単純差は真サプライズでない)
-  - §11.5 共通 loader に cfs_common.py への誘導追加
-  - CURRENT_FOCUS.md 廃止 (内容を本書 + HANDOVER + DISCIPLINE に振り分け統合)
+- 2026-06-11 v2.5 前任 ARK 代行整理 (active 11 file、 起動手順 v2.5、 自己テスト 4 問、 §10 NG/OK 追記、 §11.3 確証済み定義移植、 CURRENT_FOCUS 廃止)
+- 2026-06-11 v2.5.1 ark_guard v2 反映 (前任 ARK Q4 裁定、 警告化完了)
+- **2026-06-12 v2.6 ARK_LOOP v1 統合 (新 ARK、 selftest T1-T4 ALL PASS)**:
+  - §1 ディレクトリ: run.py v3 / ark_guard v3 (repo 直下が実体) / ml/failure_keywords.json / ml/session_state.json 反映
+  - §2 newchat / selftest subcommand + [ARK_ROTATE] 時のヨーク操作 (2 step) 追加
+  - §3 ARK_LOOP header 表 (ARK_SESSION_CHECK / ARK_PROBE_ANS / ARK_FAILURELOG_DIFF) 新設
+  - §4 run.py v3 (M1 SESSION_GATE / M3 PROBE+寿命 25 run・2 strike / M4 テーマ再注入)。 背景 = 後任 ARK 崩壊 3 層 + ヨーク 「規律 file 強化では構造的に解決しない」 → ARK 自己制御依存ゼロの機械照合化
+  - §5 ark_guard v3 (STOP-A cache int 読込 / STOP-B 棄却軸 token + DIFF なし、 v2 WARN 裁定維持、 scan_text 公開)
+  - §7/§8.2 ヨーク恒常操作に newchat 1 cmd 追加
+  - §8.5 [HANDOVER ADD] 廃止 → ARK 全文出力 + ヨーク上書き方式に統一 (ヨークは手作業編集しない運用に整合)
+  - §8.1/§10.1/§10.2 に F-050 (file 追加 / system 変更 = 同 turn 文書更新) 反映
+  - §8.3 step4 に 「skip 連続でも cron_status 日付は古くなる、 日付だけで異常断定しない」 追記 (2026-06-12 確認)
+  - §8.6 chat 交代 = [ARK_ROTATE] 機械判定に移管
+- **2026-06-12 v2.6.1 mirror 単一正本化**:
+  - §8.3/§9.2: Project files 差し替え運用 廃止 (PC から書込 API なし = 人間画面操作のみ = stale 化リスク)。 起動 fetch を 9 file 全部 mirror 取得に統一、 ヨークの claude.ai 画面操作ゼロ化
+  - 前提整備: mirror の CFS_RULES.md が UTF-16 で文字化け取得される件 (2026-06-12 起動時検知) は encoding 修正で解消する
+- **2026-06-12 v2.6.2 M5 BLOCK_GATE (run.py v3.1)**:
+  - CFS_MAP に 「検証地図」 (Block 構造: B0-B4、 各 Block に狙い/終了条件) 新設。 run.py が機械参照
+  - 全 script header に `ARK_BLOCK:` 必須 (地図に検証地図がある間)。 地図外 Block = 実行拒否。 selftest に T5 追加
+  - 発端: ヨーク指摘 「ARK の見立て/狙いが見えない、 検証沼の前に立ち戻れる地図を」。 地図は file (CFS_MAP) に常駐し、 chat 死でも引き継がれる
+- **2026-06-12 v2.6.3 M5 v2 = 1仮説1ブロック + 総括遷移 (run.py v3.2、 ヨーク設計)**:
+  - Block = 1 仮説 (「●●を○○することで△△を狙う」 の文)。 Block 内リアクション検証は自由、 Block は総括で閉じる
+  - active は常に 1 つ。 script は active Block のみ実行可。 遷移 = 旧 Block 総括 + done 化 → 新 Block active 化 (地図全文更新) が物理必須
+  - selftest T6 追加 (非 active Block 拒否 = 総括なし遷移の封鎖)
