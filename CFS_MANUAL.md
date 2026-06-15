@@ -865,3 +865,8 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
   - 対策 = handover_verify.py 新設 (run.py 関門に組込み、自己制御依存ゼロ): ①ref照合=HANDOVER/CFS_MAP の数値主張に [ref: Results/.../summary.md] を要求、無い数値は未検証として WARN ②棄却整合=FAILURE_LOG の棄却語が「到達点/現在地/土台」と書かれていたら STOP (今日の複+大+左見落としを実証で検知)
   - モード: 既定 WARN (棚卸し)。HANDOVER_VERIFY_STRICT=1 で矛盾 STOP (文書クリーン後に切替)
   - selftest T8 追加。handover_runner 本体の一次資料読込化は Phase2 (文書クリーン後)
+- **2026-06-15 v2.6.7 起動時 CDN キャッシュ回避 (fetch_fresh.py 新設)**:
+  - 問題 (実証): web_fetch (raw.githubusercontent.com) は CDN キャッシュで数日古い版を返す。2026-06-15 ARK が起動時 web_fetch で HANDOVER の 5/29 版・FAILURE_LOG の旧版を掴み「mirror が古い/同期されてない」と誤診断 (実際は mirror 実体は最新、push skip=差分なしが最新の証拠)
+  - 対策: fetch_fresh.py (ルート直下) = urllib 直叩き + no-cache header + 時刻クエリで CDN を回避し最新版を強制取得。HANDOVER/CFS_MAP/FAILURE_LOG/CFS_MANUAL/ARK_DISCIPLINE/CFS_INDEX を fresh\ に保存。実機実証で 6/12 v4.5 版 (web_fetchでは5/29版) を取得確認
+  - 起動手順: newchat 後、まず `python fetch_fresh.py` → fresh\ の版で現在地を掴む。web_fetch の CDN 古版に依存しない
+  - M1 SESSION_GATE v2 (T9): 棄却済み手法 (複+大+左 等) を ARK_SESSION_CHECK で「現在地/到達点」と書くと一次資料 FAILURE_LOG と照合し実行拒否。起動時に棄却を取り違えたまま動く道を機械封鎖
