@@ -393,6 +393,15 @@ Remove-Item Env:ARK_GUARD_STRICT                          # default に戻す
 - 物理仕様 / 規律 を ARK が無視 する事 を 黙認
 - file の手作業編集 (上書き保存のみ、 §6.3)
 
+### 8.2b 検証フローの登場人物 (2026-06-15 明記、 廃止概念の誤認防止)
+
+現在運用している役割は **ARK と ヨークと BREAKER の 3 者のみ**。
+
+- **ARK**: 仮説設計・script・分析 (§8.1)
+- **ヨーク**: 大方針判断・検証 trigger・規律監督 (§8.2)
+- **BREAKER (現役)**: ARK が確証を得た「確定候補」(主張+根拠データ+想定弱点) を、別 Incognito スレッドで独立にストレステストする関門。コードのみ渡し期待値は伝えない。突破して初めて「確定」に昇格 (F-044)。検証の代行ではなく、確定の質を担保する選別役
+- **★ CLUTCH / LONG (廃止、過去概念)**: 過去に検証フロー (ARK→LONG→CLUTCH 等) で使われた役割だが **現在は運用なし** (2026-06-15 ヨーク確認)。古い文書・memory に CLUTCH/LONG の記述が残っていても、現役と誤認しないこと。複利定義 v6b 等「CLUTCH 確認済み」と書かれた過去の確定事項は有効だが、CLUTCH という役割自体はもう存在しない
+
 ### 8.3 新セッション 起動時 必須手順 (起動 prompt に設定済、 ★ v2.6.1 mirror 単一正本化)
 
 ★ **v2.6.1 (2026-06-12)**: Project files 差し替え運用は **廃止**。 claude.ai Project files は PC から書き込む API が無く人間の画面操作でしか更新できない = 放置で stale 化する。 起動 prompt が 9 file 全部を mirror から fetch する現運用では冗長。 **正本 = mirror**。 Project files が残っていても参考扱い (版が古い可能性あり、 mirror 取得分を優先)。
@@ -871,3 +880,6 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
   - 対策: fetch_fresh.py (ルート直下) = urllib 直叩き + no-cache header + 時刻クエリで CDN を回避し最新版を強制取得。HANDOVER/CFS_MAP/FAILURE_LOG/CFS_MANUAL/ARK_DISCIPLINE/CFS_INDEX を fresh\ に保存。実機実証で 6/12 v4.5 版 (web_fetchでは5/29版) を取得確認
   - 起動手順: newchat 後、まず `python fetch_fresh.py` → fresh\ の版で現在地を掴む。web_fetch の CDN 古版に依存しない
   - M1 SESSION_GATE v2 (T9): 棄却済み手法 (複+大+左 等) を ARK_SESSION_CHECK で「現在地/到達点」と書くと一次資料 FAILURE_LOG と照合し実行拒否。起動時に棄却を取り違えたまま動く道を機械封鎖
+- **2026-06-15 v2.6.8 検証フローの登場人物を §8.2b に明記**:
+  - 現役 = ARK / ヨーク / BREAKER の 3 者のみ。CLUTCH / LONG は過去概念で現在運用なし (ヨーク確認)
+  - 目的: 古い文書・memory に残る CLUTCH/LONG を次 ARK が現役と誤認しないため (複+大+左を到達点と誤認したのと同型の防止)。「CLUTCH 確認済み」と書かれた過去の確定事項 (複利定義 v6b 等) は有効、役割自体は廃止
