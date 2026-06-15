@@ -406,7 +406,11 @@ Remove-Item Env:ARK_GUARD_STRICT                          # default に戻す
 
 ★ **v2.6.1 (2026-06-12)**: Project files 差し替え運用は **廃止**。 claude.ai Project files は PC から書き込む API が無く人間の画面操作でしか更新できない = 放置で stale 化する。 起動 prompt が 9 file 全部を mirror から fetch する現運用では冗長。 **正本 = mirror**。 Project files が残っていても参考扱い (版が古い可能性あり、 mirror 取得分を優先)。
 
-1. **web_fetch で 以下 9 file を取得 (起動 prompt 設定済)**:
+1. ★ **まず `cd C:\mnt\data; python fetch_fresh.py` を実行 (2026-06-15、CDN回避の正式手段)**。
+   urllib 直叩き + no-cache で一次資料の最新版を fresh\ に保存する。web_fetch (raw.githubusercontent.com) は
+   CDN キャッシュで数日古い版を返す事が実証済み (2026-06-15、5/29版を掴み誤診断)。**起動時は fetch_fresh を正とする**。
+   fetch_fresh が取る: HANDOVER_LATEST / CFS_MAP / FAILURE_LOG / CFS_MANUAL / ARK_DISCIPLINE / CFS_INDEX。
+   不足分 (CFS_RULES/CFS_DIRECTION/ARK_PHILOSOPHY/P1_DEFINITION) は web_fetch で補うが、版が古い可能性を念頭に。
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS_RULES.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/ARK_DISCIPLINE.md
    - https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS_MANUAL.md
@@ -437,7 +441,7 @@ Remove-Item Env:ARK_GUARD_STRICT                          # default に戻す
 7. ヨーク 対話 開始
 
 ★ 上記 1-6 を **省略 不可**、 完了後 でないと 仮説提案 NG
-★ web_fetch が古いキャッシュを返す事がある (raw.githubusercontent.com)。 最新確認は urllib 直叩き推奨
+★ web_fetch は CDN キャッシュで古い版を返す事がある (raw.githubusercontent.com、2026-06-15 実証)。**最新確認は手順1の `python fetch_fresh.py` を正とする** (urllib 直叩き + no-cache を script 化済)
 
 ### 8.4 引継ぎ file 更新メカニズム
 
