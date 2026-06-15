@@ -862,9 +862,10 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
   - 効果: 次の ARK は web_fetch する CFS_INDEX 1 枚で「何を試し何が分かったか」を読め、Results 漁り不要
 - **2026-06-15 v2.6.6 引継ぎ整合 verify (負の連鎖の根治、前任質問書 D2 + ヨーク指示)**:
   - 確定した根本原因: handover_runner.py の入力は「前HANDOVER + today_results の再要約」のみで Results 一次資料を読まない (docstring 確定)。→ cfs184 が中央2.32x でも HANDOVER は古い2.91x/3.24x を再要約し続けた。複+大+左は FAILURE_LOG で棄却済みなのに CFS_MAP で到達点のまま。前任も同じ轍 (伝聞転記) を自認
-  - 対策 = handover_verify.py 新設 (run.py 関門に組込み、自己制御依存ゼロ): ①ref照合=HANDOVER/CFS_MAP の数値主張に [ref: Results/.../summary.md] を要求、無い数値は未検証として WARN ②棄却整合=FAILURE_LOG の棄却語が「到達点/現在地/土台」と書かれていたら STOP (今日の複+大+左見落としを実証で検知)
-  - モード: 既定 WARN (棚卸し)。HANDOVER_VERIFY_STRICT=1 で矛盾 STOP (文書クリーン後に切替)
-  - selftest T8 追加。handover_runner 本体の一次資料読込化は Phase2 (文書クリーン後)
+  - 対策 = handover_verify.py 新設 (run.py 関門に組込み、自己制御依存ゼロ): **棄却整合チェック** = FAILURE_LOG の棄却語 (複+大+左 等) が HANDOVER/CFS_MAP で「到達点/現在地/土台」と書かれていたら STOP。6/11 の棄却済み転記失態を機械封鎖
+  - ★当初 ref照合 (数値行に [ref:path] 要求) も実装したが、CFS_MANUAL 規定外の過剰要件で方針文/目標文/テーマ (HANDOVER の背骨、ref不要) まで巻き込み 87件 noise を出したため同日撤去 (前任判定 D2=(c))。残すは棄却整合のみ
+  - モード: 既定 WARN。HANDOVER_VERIFY_STRICT=1 で矛盾 STOP。M1 SESSION_GATE v2 (T9) と同じ棄却整合思想で入口・cron 両面を守る
+  - selftest T8 (handover_verify 稼働) 維持
 - **2026-06-15 v2.6.7 起動時 CDN キャッシュ回避 (fetch_fresh.py 新設)**:
   - 問題 (実証): web_fetch (raw.githubusercontent.com) は CDN キャッシュで数日古い版を返す。2026-06-15 ARK が起動時 web_fetch で HANDOVER の 5/29 版・FAILURE_LOG の旧版を掴み「mirror が古い/同期されてない」と誤診断 (実際は mirror 実体は最新、push skip=差分なしが最新の証拠)
   - 対策: fetch_fresh.py (ルート直下) = urllib 直叩き + no-cache header + 時刻クエリで CDN を回避し最新版を強制取得。HANDOVER/CFS_MAP/FAILURE_LOG/CFS_MANUAL/ARK_DISCIPLINE/CFS_INDEX を fresh\ に保存。実機実証で 6/12 v4.5 版 (web_fetchでは5/29版) を取得確認
