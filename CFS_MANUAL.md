@@ -61,9 +61,13 @@ C:\mnt\data\
 ### 標準 flow (cmd 1 個)
 
 ```powershell
-cd C:\mnt\data
-python run.py scripts\xxx.py
+cd C:\mnt\data; python run.py scripts\xxx.py
 ```
+
+★ **2026-06-12 再発防止ルール (F-051、必須)**: ARK がヨークに渡す**全ての実行 cmd は、必ず `cd C:\mnt\data;` 始まりの 1 行**にする (複数行に分けない)。
+- 真因 (data で確定): この PC は OneDrive 既知フォルダ移動により Personal フォルダが OneDrive 配下にリダイレクトされ、新規 PowerShell 窓は System32 や OneDrive ドキュメントから始まる。`cd` 無しの相対パス cmd (`scripts\...`、`ファイル2\...`) は別の場所を探し FileNotFoundError になる。
+- これは PC の故障ではなく、ARK の cmd の出し方が不統一だったことが表面化したもの。ARK 側で `cd` 固定すれば窓の起動方法に依存せず必ず正しい場所で動く。
+- 適用範囲: run.py 実行だけでなく、type / python -c / del / git 等、ARK が出す全 cmd。ヨークは「cd が無い」cmd を差し戻してよい。
 
 自動進行:
 1. ARK_LOOP 関門 (M1 SESSION_GATE / M3 PROBE 照合 / PREFLIGHT / ark_guard)
@@ -76,11 +80,11 @@ python run.py scripts\xxx.py
 ### ★ ARK_LOOP subcommand (2026-06-12 新設)
 
 ```powershell
-python run.py newchat    # 新 chat 開始時に 1 回 (state reset、 次 script に ARK_SESSION_CHECK 必須化)
-python run.py selftest   # 機構の機械受入テスト T1-T4 (改修時の健全性確認)
+cd C:\mnt\data; python run.py newchat    # 新 chat 開始時に 1 回 (state reset、 次 script に ARK_SESSION_CHECK 必須化)
+cd C:\mnt\data; python run.py selftest   # 機構の機械受入テスト T1-T6 (改修時の健全性確認)
 ```
 
-- [ARK_ROTATE] が画面に出たら: ①現 chat ARK に HANDOVER 全文更新を出させ上書き保存 → ②新 chat 起動 + `python run.py newchat`。 newchat まで run.py は検証実行を拒否する
+- [ARK_ROTATE] が画面に出たら: ①現 chat ARK に HANDOVER 全文更新を出させ上書き保存 → ②新 chat 起動 + `cd C:\mnt\data; python run.py newchat`。 newchat まで run.py は検証実行を拒否する
 
 ### 結果 確認
 
@@ -847,3 +851,17 @@ python -c "import pandas as pd; df=pd.read_csv(r'C:\mnt\data\cache\adjo_cache_54
   - Block = 1 仮説 (「●●を○○することで△△を狙う」 の文)。 Block 内リアクション検証は自由、 Block は総括で閉じる
   - active は常に 1 つ。 script は active Block のみ実行可。 遷移 = 旧 Block 総括 + done 化 → 新 Block active 化 (地図全文更新) が物理必須
   - selftest T6 追加 (非 active Block 拒否 = 総括なし遷移の封鎖)
+- **2026-06-12 v2.6.4 運用実態の修正 3 件 (ヨーク指摘起点)**:
+  - F-051 新設: ARK が出す全 cmd は `cd C:\mnt\data;` 始まり 1 行に固定 (真因 = OneDrive 既知フォルダ移動で新規 PowerShell 窓が System32/OneDrive から始まる。PC 故障でなく ARK の cmd 不統一が表面化)
+  - 番号衝突の記録: 本日 ARK が付けた cfs141-148 は前任系 (cfs141_episode_reshape 等) と衝突。file 名相違で上書きは無いが、**今後の採番は既存最大 (cfs184) の次 = cfs185 から**
+  - archive 実態不一致: HANDOVER の「cfs138-184.md 46 個を archive へ退避」は disk・git 履歴とも存在せず = 引継ぎ要約が一次資料と食い違う実例。push_to_mirror v3.2 で archive/ 同期は追加済だが、中身 (cfs ごとメモ) は未整備。過去検証の一次資料は scripts の purpose 宣言 + Results のみ
+- **2026-06-12 v2.6.5 結論台帳 (引継ぎ機構の再設計、ヨーク指摘起点)**:
+  - 問題: cron の Claude API 集約 (HANDOVER) は「要約」を作るが個別 script の結論 (例 cfs90 = 信用倍率 2.877x で P1 未達) は圧縮で消え、虚偽記述 (archive 46個) も生じた → ARK が毎回 Results を漁る
+  - 対策 = 二層分離: ①結論台帳 = 各 script が `ARK_CONCLUSION:` を宣言 → run.py が実行後に CFS_INDEX.md へ purpose と並べ自動追記 (機械台帳、ARK の作文でなく実行時に積む)。同 script 再実行は結論行を置換。②HANDOVER (cron) は現在地・公式数値・active Block に役割限定
+  - ark_guard v4: ARK_CONCLUSION 欠落を WARN (結論は実行後判明のため STOP でなく WARN)
+  - 効果: 次の ARK は web_fetch する CFS_INDEX 1 枚で「何を試し何が分かったか」を読め、Results 漁り不要
+- **2026-06-15 v2.6.6 引継ぎ整合 verify (負の連鎖の根治、前任質問書 D2 + ヨーク指示)**:
+  - 確定した根本原因: handover_runner.py の入力は「前HANDOVER + today_results の再要約」のみで Results 一次資料を読まない (docstring 確定)。→ cfs184 が中央2.32x でも HANDOVER は古い2.91x/3.24x を再要約し続けた。複+大+左は FAILURE_LOG で棄却済みなのに CFS_MAP で到達点のまま。前任も同じ轍 (伝聞転記) を自認
+  - 対策 = handover_verify.py 新設 (run.py 関門に組込み、自己制御依存ゼロ): ①ref照合=HANDOVER/CFS_MAP の数値主張に [ref: Results/.../summary.md] を要求、無い数値は未検証として WARN ②棄却整合=FAILURE_LOG の棄却語が「到達点/現在地/土台」と書かれていたら STOP (今日の複+大+左見落としを実証で検知)
+  - モード: 既定 WARN (棚卸し)。HANDOVER_VERIFY_STRICT=1 で矛盾 STOP (文書クリーン後に切替)
+  - selftest T8 追加。handover_runner 本体の一次資料読込化は Phase2 (文書クリーン後)
