@@ -213,3 +213,6 @@ cfs190_entry_confirm [結論/OK 06-16] | cfs190第一段: 中勝ち濃縮入口�
 cfs191_law_confirm [結論/OK 06-16] | cfs191: 10xデータから導いた法則(from_high低+ma_5_20高)を確定simで現実再現。OOS複利を取得。壁打ちでなくデータ駆動の法則の検証
 cfs192_fantasy_prove [結論/OK 06-16] | cfs192: 算数仮説手法CFS-FANTASY(hold3 tp+10/sl-4 入口3条件)を実データ立証。入口実性能と確定sim複利を取得
 cfs193_ark1_param [結論/OK 06-16] | cfs193: ARK-1枠内tp/sl網羅。入口固定で最大{best:.2f}x。生存域有無でARK-1の生死を確定
+cfs194_ark2_margin [結論/OK 06-16] | cfs194 ARK-2: 信用法則(ls_ratio高+long_chg増)を確定simで現実再現。価格出来高ARK-1(0.87x死亡)の入口を需給軸に変えOOS複利取得
+cfs195_ark2_pct [結論/OK 06-16] | cfs195 ARK-2枠内: 信用特徴を当日断面分位化(外れ値頑健)で再検証。中勝ち含有リフトと確定sim複利を取得
+cfs196_ark2_diag [結論/OK 06-16] | cfs196 ARK-2診断: 信用ls濃縮の母集団層別。流動性層でリフト復活するか/偽濃縮か切り分け
