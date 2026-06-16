@@ -209,3 +209,7 @@ cfs_sort_file2 | 私(歴代ARK)がファイル2にcfsXXX.md等を大量に作り
 cfs_token_audit | 前任裁定の最優先E。push_to_mirror.pyがgithub_patをログ平文出力=流出risk。token出力箇所を実体で全部洗い、既存ログ(watcher.log/ml_output)にtokenが残存しないか確認。推測でマスクを当てず実ファイル確認後に直す(F-04
 cfs185_investor_regime [結論/OK 06-15] | 投資部門別Bal(13部門)の中央値は神の目大化け(investor期間で僅か47件)と全部門で差なし(判定差小)。外国人/個人Balとmkt_ret20の相関+0.075/+0.079=価格と独立だが大化けと差がないため意味薄。検出力(n47)に難。B2仮説に否定的だが薄さのため未確定→次枝は検出力を上げる設計が要る
 cfs186_investor_quality [結論/OK 06-15] | 実行後に記入予定(前提チェックの件数 / 資金フロー分位で勝ちの質に差が出たか / B2仮説の生死)
+cfs190_entry_confirm [結論/OK 06-16] | cfs190第一段: 中勝ち濃縮入口を確定sim(cfs_common.sim_equal_weight)にwalk-forwardで乗せOOS素倍率を取得。左裾カットは第二段
+cfs191_law_confirm [結論/OK 06-16] | cfs191: 10xデータから導いた法則(from_high低+ma_5_20高)を確定simで現実再現。OOS複利を取得。壁打ちでなくデータ駆動の法則の検証
+cfs192_fantasy_prove [結論/OK 06-16] | cfs192: 算数仮説手法CFS-FANTASY(hold3 tp+10/sl-4 入口3条件)を実データ立証。入口実性能と確定sim複利を取得
+cfs193_ark1_param [結論/OK 06-16] | cfs193: ARK-1枠内tp/sl網羅。入口固定で最大{best:.2f}x。生存域有無でARK-1の生死を確定
