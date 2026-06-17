@@ -221,3 +221,4 @@ cfs198_ark3_mid [結論/OK 06-17] | cfs198 ARK-3枠内: 信用買残中庸を高
 cfs199_ark3_sg [結論/OK 06-17] | cfs199 ARK-3枠内: 選択スコアを信用中庸度にし日次selで中庸を効かせ複利検証。リフト1.2xが複利に届くか
 cfs200_ark3_sgshape [結論/OK 06-17] | cfs200 ARK-3枠内: 選択スコアをcfs197実測リフト形にしsG精度で複利検証。cfs199の1.04xから動くか
 cfs201_ark3_width [結論/OK 06-17] | cfs201 ARK-3枠内: 信用中庸の幅を振り濃い帯に絞れるか。1.04xから動くか
+cfs202_ark3_holdgrid [結論/OK 06-17] | cfs202 ARK-3本筋: netfixを価格からhold別再計算しhold振り。信用中庸が短holdで1.04xから動くか
