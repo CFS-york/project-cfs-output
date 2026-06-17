@@ -21,9 +21,10 @@ ARK 引継ぎ書。 **最新整理版**。
 - **段階推定で修正繰り返さない** (F-040)。 真原因確定後、 1 回で修正
 
 ### 復帰手順 (ARK 起動時、 §8.3 強制)
-1. mirror から 6 file web_fetch 取得:
-   - CFS_RULES.md、 ARK_DISCIPLINE.md、 CFS_MANUAL.md、 HANDOVER_LATEST.md、 HANDOVER_FULL.md、 FAILURE_LOG.md
-   - ml_output/cron_status.json
+1. mirror から核 file web_fetch 取得:
+   - CFS_RULES.md、 ARK_DISCIPLINE.md、 CFS_MANUAL.md、 HANDOVER_LATEST.md、 HANDOVER_FULL.md、 FAILURE_LOG.md、 CFS_MAP.md
+   - ★ CFS_STRUCTURE.md(運用構造・人格・更新主体の一枚図、 2026-06-17新設)、 CFS_RUN_PLAYBOOK.md(検証実行プレイブック=script骨格/自作sim禁止/合格判定、 2026-06-17新設)
+   - DATA_MAP.md、 ml_output/cron_status.json
 2. cron_status.json の result 確認:
    - result=success → 通常続行
    - result=failed or 連続失敗>=2 → cron 修理 最優先
@@ -32,6 +33,7 @@ ARK 引継ぎ書。 **最新整理版**。
 4. 本 HANDOVER_LATEST 通読 (現在地 + 次アクション)
 5. FAILURE_LOG.md 通読 (棄却軸)
 6. ★★ CFS_MAP.md 通読 (仮説の定義/立て方/意味、 仮説ロット台帳 ARK-1〜7、 10x方程式) ← 2026-06-17 最重要追加
+6b. ★ CFS_STRUCTURE.md(運用構造・人格・更新主体・現在地の単一性)+ CFS_RUN_PLAYBOOK.md(検証の実行フロー・script骨格・自作sim禁止・合格判定・10x方程式)通読 ← 2026-06-17新設。検証を実行する前に必読
 7. ★ 自己テスト (理解確認、 §8.3 v2.5 新設、 2026-06-11):
    - Q: 現在地 mult は?
    - Q: 直近 棄却軸 は?
@@ -253,7 +255,7 @@ ARK 引継ぎ書。 **最新整理版**。
 ## 8. 次セッション ARK へ
 
 ### 必読順序
-1. CFS_RULES → 2. ARK_DISCIPLINE → 3. 本HANDOVER_LATEST → 4. FAILURE_LOG → 5. ★★CFS_MAP(仮説の定義/立て方/意味・ロット台帳) → 6. CFS_MANUAL → 7. HANDOVER_FULL(詳細時)
+1. CFS_RULES → 2. ARK_DISCIPLINE → 3. 本HANDOVER_LATEST → 4. FAILURE_LOG → 5. ★★CFS_MAP(仮説の定義/立て方/意味・ロット台帳) → 6. ★CFS_STRUCTURE(運用構造) + CFS_RUN_PLAYBOOK(検証実行) → 7. CFS_MANUAL → 8. DATA_MAP → 9. HANDOVER_FULL(詳細時)
 
 ### ★ 起動時必須 (§8.3)
 1. cron_status.json確認 (failed/連続失敗ならcron修理優先)

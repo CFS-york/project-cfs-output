@@ -16,6 +16,8 @@
 ## ファイル2 (引継ぎ核、mirror同期対象)
 - `HANDOVER_LATEST.md` / `HANDOVER_FULL.md` — 現在地・全履歴
 - `CFS_MAP.md` — 検証地図 + ★仮説ロット台帳(第1層、ARK-N生死一覧) + 立ち戻り点
+- `CFS_STRUCTURE.md` — ★運用構造の一枚図(全体フロー・更新主体・ソース優先順位・人格ARK+BREAKER・現在地の単一性・起動チェック)。2026-06-17新設
+- `CFS_RUN_PLAYBOOK.md` — ★検証実行プレイブック(検証フロー・script骨格と自作sim禁止・データ配置・物理定数・P1合格判定・10x方程式・OOS監査)。2026-06-17新設。検証実行前に必読
 - `FAILURE_LOG.md` — 棄却軸(第3層) + 構造的学び(§5.16縮約偽濃縮等)
 - `CFS_MANUAL.md` / `CFS_RULES.md` / `ARK_DISCIPLINE.md` / `ARK_PHILOSOPHY.md` / `CFS_DIRECTION.md`
 - `ファイル2\lots\ARK-N_*.md` — ★仮説ロット詳細(第2層)。ARK-1_CFS-FANTASY / ARK-2_MARGIN / ARK-3_MARGIN-MID。mirror同期(push_to_mirror v3.3〜)
@@ -35,4 +37,5 @@ ARK(/home/claude等)で作ったが本番未保存=リセットで消えるも�
 1. fetch_freshでmirror取得 → HANDOVER_LATEST通読
 2. CFS_MAPロット台帳でARK-N生死確認 → 気になるロットはlots\詳細md
 3. FAILURE_LOG §4棄却・§5学び(特に§5.16縮約偽濃縮)
-4. 本DATA_MAPで配置把握
+4. ★CFS_STRUCTURE(運用構造)+ CFS_RUN_PLAYBOOK(検証実行)通読 → 検証する前に必読
+5. 本DATA_MAPで配置把握
