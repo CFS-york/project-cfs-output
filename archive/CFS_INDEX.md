@@ -222,3 +222,7 @@ cfs199_ark3_sg [結論/OK 06-17] | cfs199 ARK-3枠内: 選択スコアを信用�
 cfs200_ark3_sgshape [結論/OK 06-17] | cfs200 ARK-3枠内: 選択スコアをcfs197実測リフト形にしsG精度で複利検証。cfs199の1.04xから動くか
 cfs201_ark3_width [結論/OK 06-17] | cfs201 ARK-3枠内: 信用中庸の幅を振り濃い帯に絞れるか。1.04xから動くか
 cfs202_ark3_holdgrid [結論/OK 06-17] | cfs202 ARK-3本筋: netfixを価格からhold別再計算しhold振り。信用中庸が短holdで1.04xから動くか
+cfs203_ark4_bigwin_margin [結論/OK 06-17] | cfs203 ARK-4-枝1: 大化け基準で信用残の選別力を診断。中勝ち基準と比較し(B)根拠の有無を確認
+cfs204_ark4_bigwin_anatomy [結論/OK 06-17] | cfs204 ARK-4-枝2: 信用最厚×大化け1.96xを年/価格/濃度勾配で解剖。(A)算数に使える本物か確認
+cfs205_ark4_bigwin_universality [結論/OK 06-17] | cfs205 ARK-4-枝3 論点A: 大化けの時期普遍性・銘柄分散・月次普遍性を倍率見ずに確認。再現可能な現象か判定
+cfs206_ark4_pointB [結論/OK 06-17] | cfs206 ARK-4論点B: 信用最厚×高位の大化け取り手法をwalk-forward/年次/MDD/P1重複で検証。手法成立かBREAKER先回り
