@@ -232,3 +232,4 @@ cfs209_ark5_postentry_clean [結論/OK 06-17] | cfs209 ARK-5-枝2: 3日選別→
 cfs210_ark6_timestructure [結論/OK 06-17] | cfs210 ARK-6-枝1: P1利益の時間構造。前半に乗れば回転加速で10x方程式、後半までなら短縮でr落ち棄却
 cfs211_ark6_p1_realtimestructure [結論/OK 06-17] | cfs211 ARK-6-枝2: P1約定銘柄(per=cash/free)の保有中リターンカーブ。利益が前半に乗るか時間構造を見る
 cfs212_ark6_p1_timestructure_fixed [結論/OK 06-17] | cfs212 ARK-6-枝3: cfs77完全流用でP1約定銘柄の時間構造。n389再現を確認し利益が前半に乗るか判定
+cfs213_ark7_shortsale [結論/OK 06-17] | cfs213 ARK-7-枝1: 空売り比率で大化けと外れが分離するか。信用買残と別の需給軸で§5.17の壁を破れるか

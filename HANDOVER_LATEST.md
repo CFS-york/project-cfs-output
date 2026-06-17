@@ -31,20 +31,43 @@ ARK 引継ぎ書。 **最新整理版**。
 3. CFS_MANUAL.md §0-§8 通読 (構造 + 規律 + トラブル path)
 4. 本 HANDOVER_LATEST 通読 (現在地 + 次アクション)
 5. FAILURE_LOG.md 通読 (棄却軸)
-6. ★ 自己テスト (理解確認、 §8.3 v2.5 新設、 2026-06-11):
+6. ★★ CFS_MAP.md 通読 (仮説の定義/立て方/意味、 仮説ロット台帳 ARK-1〜7、 10x方程式) ← 2026-06-17 最重要追加
+7. ★ 自己テスト (理解確認、 §8.3 v2.5 新設、 2026-06-11):
    - Q: 現在地 mult は?
    - Q: 直近 棄却軸 は?
    - Q: cron_status.json の result は?
+   - Q: 次の最優先タスクは?
    - 答えられない → 該当 file 再読 強制
-7. ここまで完了 後 仮説/次手 提案
+8. ここまで完了 後 仮説/次手 提案
 
 ### 同期の真実
-- ローカル `C:\mnt\data\ファイル2\` の各 .md → mirror への同期 = 正常稼働 (watcher v2.4、 push_to_mirror v3)
+- ローカル `C:\mnt\data\ファイル2\` の各 .md → mirror への同期 = 正常稼働 (watcher v2.4、 push_to_mirror v3.4)
 - 「mirror が古い」 と見えたら、 まず raw の CDN キャッシュ を疑え。 urllib 直叩き で照合
 
 ---
 
 ## 1. 現在地 (data 上)
+
+### ★★★ 2026-06-17 更新: ARK-1〜7で「大化けの壁」を6〜7角度から確定 (最新の到達)
+
+公式現在地はP1=3.09x(不変)。本日、仮説ロット制で7仮説を立て6つを棄却、ARK-7(空売り)は検証中。9ヶ月の壁の正体を複数角度から一つの構造に確定した。
+
+**確定した壁(cfs207 + ARK-1〜7)**:
+- 10xは大化け牽引(cfs207: 10x解の利益85%が上位5%トレード=中勝ち積み重ねでは届かない)
+- 大化けへのあらゆる接近で、大化けの"率"は上げられても複利の"平均r"が10x水準(hold20でr≥15.13%)に届かない:
+  - ARK-1(価格出来高入口)0.87x / ARK-2(信用買残正方向)中勝ち逆相関 / ARK-3(信用中庸)1.04x単体上限・分散の素候補
+  - ARK-4(大化け×信用事前濃縮): 論点A=大化けは普遍現象YES(全年1.01%全月)、論点B=手法成立NO(0.86x MDD-41%)
+  - ARK-5(大化け事後捕捉): 3日急伸→4日目以降net+0.29%、r15%に桁違い不足
+  - ARK-6(P1回転加速): P1利益は前半20日で57%しか乗らずhold短縮でr落ち2.26x(cfs43裏付け、cfs77完全流用でn390再現)
+  - ARK-7(空売りで分離、検証中): cfs213で空売り最多群=大化けリフト1.66xだが外れの損(下位5%)-16.9%と最深=非対称(l浅)の前提苦しい、棄却寄り。損切りl=-8%でl限定の確定simが未検証で生死未確定
+- **§5.17/総括**: 大化けと外れが同居する母集団は率を濃縮しても外れの損が平均rを薄める。買う前(cfs60-61)・事前(§5.17)・事後(ARK-5)・空売り(ARK-7)で一貫=壁の最も一般化された姿
+
+**10x方程式(本日確立、仮説必須)**: (1+r)^N=10、N=327/hold。P1=hold40 r14.80% N8.18→3.09x。10xはhold20でr≥15.13%。仮説は必ずこの方程式でr・Nを置きARKが自分で検算(CFS_MAP正本)
+
+**仮説の定義・立て方・意味(本日確立、CFS_MAP正本)**:
+- 意味: 仮説は「10xの式が成り立つ世界をどう実現させようとするか」の言語化。保証でなく挑戦。確信を求めるな(求めると壁打ちに堕ちる)
+- 立て方: ①過去データ現物で土台固め→②確信なく大胆に(A〜E)で立てる→③検証で殺す。確信集めの測定(壁打ち)に油断すると戻る
+- 中身A〜E: A=10x方程式(必須) B=データ根拠 C=入口パラ D=出口資金管理 E=生死条件
 
 ### ★★★公式 現在地: P1 = 3.09x (cfs37-77 系統、 5/29-6/05 確定)
 
@@ -56,47 +79,16 @@ ARK 引継ぎ書。 **最新整理版**。
 - **手持ちデータの識別限界 (cfs60-61)**: 実 ML test 相関 0.033 = 実効 p≈0。 手持ちデータ (価格/出来高/財務) では広い母集団の勝ち銘柄を事前識別できない。 必要 p0.4 vs 現実 p0 のギャップを埋めるには新情報軸 (信用残/分足) が要る
 - **10x までの距離: P1 起点で約 3.2 倍不足**
 
-### ★ 道B シミュレータ初稼働候補 (cfs70、 2026-06-05)
-
-- cfs70_path_anatomy: n=500 の 10x 解 trade log 生成。 mult_max=40.4x、 mult_mean=14.248x、 mult_p90=18.466x
-- 道B = 10x 解の共通構造発見 (道A=パラメータ総当たり=過適合製造機、 禁止)
-- ★ cfs140 (2026-06-12) で 「共通構造は行動 (出口) には無い」 が定量確定 → 道B の対象は **選択の構造** に絞られた
-
 ### 探索状況 (旧軸の到達点)
 - 既存最良 cell 真 mult = **1.141x (mp=1、 MDD46.6%)** (cfs12/13 独立一致・確定)
 - cell: gap=0.065、 ext=4、 universe=4000-7000、 HIGH20、 p1u=2%、 p1d=-6%、 Ch=7
 
-### ★★★ 次フェーズ方針 (ヨーク主導): 検証と分析の分離
-
-1. **道B シミュレータ深化 (最優先)**: cfs70 の n=500 10x 解から共通する事前構造 (entry 条件 / 保有期間 / 銘柄属性等) を ARK が解析。 ★ cfs140 により対象は 「選択の構造」 (どの日・どの銘柄を取ったか、 その t 時点の事前共通点)。 設計は BREAKER に通して固定。 道A 禁止
-2. **新情報軸 (信用残/空売り/分足)**: cfs61 で識別精度限界 (p≈0) が定量確定。 J-Quants 拡張の戦略判断 (ヨーク)。 信用残が最有力 (P1 の正体=需給に直接)
-3. **P1 境界が谷である理由 (BREAKER 2 度釘刺し)**: 隠れた選択バイアス。 3.09x の頑健性に関わる
-4. **cfs90_margin_sim の詳細確認**: マージン活用で P1 を超えられるか。 mult_max=3.090x、 mean=2.663x の内訳精査
-
-### 重要軸 (LightGBM importance gain TOP)
-gap (23,129) / universe (20,813) / vol (12,381) / p1_dn (2,855) / ext (2,556)
-
-### システム状況 (2026-06-12)
-- Phase 1 自動引継ぎ system: 完全稼働
-- ★★★ ARK_LOOP v1 実装完了 (2026-06-12、 selftest T1-T4 ALL PASS):
-  - 背景: 後任 ARK 崩壊 3 層 (読んだ≠理解した / 記憶+場当たり / 文脈累積で言語崩壊) + ヨーク指摘 「規律 file 強化では構造的に解決しない (言葉 layer と行動 layer の分離)」 → ARK 自己制御に依存しない物理機構
-  - M1 SESSION_GATE (run.py v3): `python run.py newchat` 後の最初の script に ARK_SESSION_CHECK 必須。 HANDOVER 真値 (公式 mult / 最優先 / 直近棄却) と文字列照合、 不一致 = 実行拒否
-  - M2 (ark_guard v3): cache code4=int 読込 = STOP (確定クラッシュ)。 棄却軸 token (ml/failure_keywords.json) + ARK_FAILURELOG_DIFF 宣言なし = STOP。 v2 WARN 裁定 (既存 3 check) は維持、 BYPASS 脱出路も維持
-  - M3 PROBE LOOP (run.py v3): 毎 run footer に probe 2 問印字 → 次 script の ARK_PROBE_ANS を機械照合。 誤答 = strike。 2 strike or 25 run で [ARK_ROTATE] = chat 強制交代 + 以後実行拒否 (newchat まで)
-  - M4: CFS_MAP 「今の検証テーマ」 を毎 run 再注入
-  - ヨーク新規操作: chat 切替時の `python run.py newchat` 1 cmd のみ
-  - 残存穴 (正直に): script を伴わない純対話 turn は関門を通らない。 M3 周期 + 寿命上限で有界化、 最後の網はヨークの 「GATE は?」
-- 新 ARK 引継ぎ完了 (2026-06-12): 引継ぎテスト 8/8 通過、 前任 ARK 撤収、 領域境界 (F-049) 遵守
-- cron auto_handover: 復旧+自己検知ループ稼働 (2026-06-03 修正版、 JSON→マーカー方式、 max_tokens 16000)
-- cron 健全性: 6/05-6/11 全 run 緑 (#13-#19)、 6/09 以降は検証 push 空白で skip 動作
-- HANDOVER 2 ファイル分離 完成 (2026-06-03): LATEST (active 版) + FULL (全履歴版)
-- ファイル2 整理 完了 (2026-06-11): cfs138-184.md 46 個を archive\ へ退避、 引継ぎ核 11 file のみ active
-- CURRENT_FOCUS.md 廃止 (2026-06-11): 内容を HANDOVER/DISCIPLINE/MANUAL §11 に振り分け統合
-- push_to_mirror.py v3 (2026-06-11): token mask 化 (流出防止、 機能影響ゼロ)
-- ark_guard.py v2 (2026-06-11): 警告化完了 (WARN default + STRICT/BYPASS option、 前任 ARK Q4 裁定)
-- run.py v2 (2026-06-11): CURRENT_FOCUS 廃止対応 (HANDOVER §1 現在地 表示) + ファイル2 path bug 同時 fix
-- 拡張 BLACKLIST 33 銘柄確定 (clean_blacklist.csv)
-- ★ CFS_MANUAL §11.2/11.5 要改訂 (2026-06-12): code4 は **str** が正 ('132A' 等英字コード、 int 読込は ValueError 実証)。 旧記述 (int64) のまま = 新 ARK が 1 回クラッシュ。 ヨーク承認後 MANUAL 改訂
+### システム状況 (2026-06-17 更新)
+- ARK_LOOP v1 稼働 (run.py v3: M1 SESSION_GATE / M3 PROBE・寿命25run2strike / M4テーマ再注入)。 本 session は run25/25 で [ARK_ROTATE] 発火
+- 引継ぎ整備 (2026-06-16〜17): lots\ フォルダ (ARK-1〜3詳細md)、 DATA_MAP.md、 push_to_mirror v3.4 (lots/DATA_MAP同期)、 ARK_DISCIPLINE v1.8 (F-051引き継ぎ完全性)、 FAILURE_LOG v2.2、 CFS_MAP (仮説の定義/立て方/意味・ロット台帳)
+- cron auto_handover 稼働 (23:59 JST、 今日のpush内容を元に自動整理)
+- 拡張 BLACKLIST 33 銘柄 (clean_blacklist.csv)
+- ★ CFS_MANUAL §11.2/11.5 要改訂: code4 は **str** が正 ('132A' 等英字、 int 読込は ValueError 実証)
 
 ---
 
@@ -105,133 +97,93 @@ gap (23,129) / universe (20,813) / vol (12,381) / p1_dn (2,855) / ext (2,556)
 - 既存最良 cell 真 mult = 1.141x (cfs12/13 独立一致)。 全旧表記 (2.887x/4.311x/2.062x) は誤り
 - look-ahead bias source 確定 (FAILURE_LOG §3)
 - trail/stop loss/sl タイト固定 は物理機能しない
-- 旧体制 (正当価格 v4/v5) は 1.7x 天井で棄却済
-- τ 軸・H4e 系全体打ち止め。 逆張り平均回帰 (cfs15) は全層 EV マイナス
-- N 増路線 (cfs17) 否定: N111 にマイナス 23 個混入で mult 1.141x→0.27x 崩壊
-- betting 軸決着: net プラス edge 1 つでは全額逐次が複利最大
-- cfs28: 逆張り gapdown 反発を確定畳み複利 sim に乗せると mult 0.035x/MDD96.5% 壊滅
 - ★★★ P1 K20hold40 = 3.09x/MDD14%/5 年全プラス/地合い非依存/パラメータ近傍滑らか = 本物の edge
 - cfs42-44: P1 への追加選別・利確 TP・TOPIX 地合い フィルタ全て mult 低下。 P1 構造は既に最適
 - cfs48-54: P1 いじり/別系統/ML 大化け/ML ネット/財務の 5 方向全て P1 超えず
 - cfs55: P1 母集団の神の目天井 K20=3.33x。 10x の素は P1 外の広い母集団に存在
-- cfs56-57: K1 天井 16.97x (3.7 年累積)。 境界 ±5% で天井 20-70x 激変 = 現境界は谷
 - cfs58: 16 ヶ月換算で神の目 K1 でも 2.1x = P1 母集団は 16 ヶ月 10x 速度なし
-- cfs59: 広い母集団は識別なし 0.71x。 素直な単軸は捕捉不能
 - cfs60-61: 実 ML test 相関 0.033 = 実効 p≈0。 手持ちデータでは広い母集団の識別不可 (定量確定)
-- cfs68: モメンタム複利は mult_max 0.836x = P1 超えず棄却方向
 - cfs70: 道B シミュレータ 初稼働候補。 n=500 で mult_mean 14.2x/p90=18.5x
-- cfs74/75: 広い母集団 神の目天井 1488x 再確認 (cfs55 と一致)。 実運用値でない
 - cfs77: P1 真値 3.084x 確認 (公式 3.09x と整合)
-- cfs90: margin_sim mult_max=3.090x。 マージン活用でも P1 水準止まり (詳細要確認)
-- ★ cfs140 (2026-06-12): 広域 pool では 「出口単独」 に選別力なし (OOS mean_log>0 = 0/384)。 神の目 wr77.7% vs 現実 pool wr30% の差 +45pt = 選択 (未来 net) の寄与と定量確認。 出口は選択がある場合のみ機能する増幅器。 grid 勾配は持ち切り (P1 型) 方向 = cfs165/cfs59 と整合
-- ★ alloc 定義 (per=cash/free vs alloc=cash/n_take) は候補数 ≥ 空き枠で数式的に恒等 (cfs140 で diff 全 0 実証)。 定義差が出るのは疎シグナル戦略 (P1 等、 候補<枠) のみ。 定義衝突は未決着で保留
+- ★ cfs140 (2026-06-12): 広域 pool では 「出口単独」 に選別力なし (OOS mean_log>0 = 0/384)。 勝ちは選択(入口)に宿る。 出口は選択がある場合のみ機能する増幅器
+- ★ cfs207 (2026-06-17): 10x解は大化け牽引 (利益85%が上位5%トレード)。 中勝ち積み重ねでは10x未達
+- ★★★ §5.17 (2026-06-17確定): 大化け発生の濃縮 ≠ 複利での勝ち。 大化けと外れが同母集団に同居し分離できず、 濃縮しても外れの損が平均rを薄め複利が勝てない。 買う前/事前/事後/空売りの全接近で一貫
 - ★★ 教訓: 新規 edge 候補は 「横断平均 net」 でなく必ず 「確定畳み複利 sim」 で最終判定
-- ★★ 枠組みの教訓: 「1 銘柄ずつ確定畳み」 は最も非効率な執行仮定。 分散ポートフォリオが正しい枠組み
-- ★★★ 2026-06-11 整理: 複+大+左 2.91x (cfs148-184 系統) は ARK 想像の天井 (2-3x 壁) 棄却対象。 FAILURE_LOG 参照
+- ★★ 枠組みの教訓: 「1 銘柄ずつ確定畳み」 は最も非効率。 分散ポートフォリオが正しい枠組み
+- ★★★ 2026-06-11 整理: 複+大+左 2.91x (cfs148-184 系統) は ARK 想像の天井 (2-3x 壁) 棄却対象
 
 ---
 
-## 3. 次アクション (優先順)
+## 3. 次アクション (優先順、 2026-06-17 ARK-1〜7完遂後)
 
-1. **道B シミュレータ深化 (最優先)**: cfs70 の n=500 10x 解から **選択の構造** (どの日・どの銘柄、 t 時点の事前共通点) を解析。 行動 (出口) は cfs140 で消去済。 BREAKER に通す。 道A 禁止
-2. **cfs90_margin_sim 詳細確認**: マージン活用で P1 を超えられるか。 mult_mean=2.663x の内訳精査
-3. **新情報軸 (信用残/空売り/分足)**: J-Quants 拡張の戦略判断 (ヨーク)。 信用残が最有力 (P1 の正体=需給に直接)
-4. **P1 境界が谷である理由**: 隠れた選択バイアス。 3.09x の頑健性に関わる
-5. CFS_MANUAL 改訂 (v2.5.1 → v2.6): §11 code4 str 化 + ARK_LOOP 運用章 追加。 ★ ARK は v2.5.1 原文未読、 ヨークの type 出力受領後に全文改訂 (F-046)
+日足データでの大化け取得・P1回転加速は6角度で壁(r15%未達)を確定。次は壁を破る方向を、確信なく10x方程式で立てる(CFS_MAPの仮説の定義に従う):
+
+1. **ARK-7(空売り)の決着**: cfs213で空売り最多群=大化けリフト1.66x・外れの損-16.9%(非対称の前提苦しい)。 損切りl=-8%でlを限定した確定simで生死を確定させる(未検証)。 ただし下位5%-16.9%はギャップダウンで損切り捕捉困難の公算
+2. **h4e / signal_all データの把握(未踏・最有力候補)**: cache に h4e_features_full(264MB)・h4e_features_lag(417MB)・h4e_scores(150+149MB)・signal_all_full(286MB) があるが本 session のARKは未使用・正体未把握。 大化けと外れの分離に使えるか確認する価値が高い。 記憶でなく現物で把握から
+3. **大化けと外れを分離する別原理**: §5.17の核心=同母集団に同居。 これを分ける軸。 investor_cache(投資主体別、ほぼ空)、 他
+4. **ARK-3信用中庸(1.04x)の分散の素**: P1と別系統。 低相関なら束ねでリスク調整後リターン改善の可能性(cfs40の壁=別原理性の実証が要る、 lots/ARK-3参照)
+5. **分足は cache に無し(2026-06-17確認)**: J-Quantsアドオン取得はヨークの戦略判断
+6. CFS_MANUAL 改訂 (v2.5.1 → v2.6): §11 code4 str 化 + ARK_LOOP 運用章
+
+★ どれもCFS_MAPの仮説の定義(意味・立て方・A〜E・10x方程式必須)に従い確信なく立てて検証。 壁打ち(確信集めの測定)に堕ちないこと。 data先・法則後(立ち戻り点)。
 
 ### 保持: 生存 edge
 - **P1 分散 3.09x (本命)**: 地合い非依存・個別要因 ドリブンの本物 edge
+- **ARK-3 信用中庸 1.04x**: 単体上限だがP1と別系統、 分散の素候補 (lots/ARK-3)
 - **順張り 1.141x (1 銘柄逐次)**: 旧枠組みでの上限
 
-### ★ 引き継がない (現任 ARK 6/06-6/11 系統)
-- **複+大+左 2.91x (cfs148-184)**: ARK 想像の天井、 FAILURE_LOG 行き
-- **CURRENT_FOCUS.md**: 廃止、 内容統合済
-- **複+左+神 3.64x (cfs172)**: 約定 15 薄、 cfs173 で崩れ却下
-- **波の起点予測 (cfs176)**: 起点 0.08% 希少、 0.80x 棄却
-- **波乗り続け (cfs180)**: M2 2.50x < M1 2.91x、 分散損失で却下
+### ★ 引き継がない (棄却済)
+- 複+大+左 2.91x (cfs148-184): ARK 想像の天井、 FAILURE_LOG 行き
+- ARK-1〜6 (2026-06-17): 大化けの壁で全棄却、 FAILURE_LOG §4 行き
+- CURRENT_FOCUS.md (廃止、 統合済)
 
 ---
 
 ## 4. 棄却済 (FAILURE_LOG.md 参照、 二度と戻らない)
 
-- 正当価格 v4/v5 / H-alpha 系 / fantasy 系
-- tp/sl logic / ret5 trigger 系 / trail / stop loss
-- τ 軸 (cfs6/6b/6c)、 発表後ドリフト 翌日寄付執行で取れない / H4e 系全体 / 逆張り平均回帰 (cfs15) / ファンダ変化率 (cfs16)
-- N 増路線 (cfs17) / fractional betting 単独 (cfs19) / precision/到達率路線 (cfs23/24)
-- 当日引け exit 骨格 (cfs25) / オーバーナイト プレミアム (cfs26)
-- 逆張り gapdown 反発 (cfs28) / 業種内相対強弱 (cfs29) / ショート (cfs30)
-- グロース大化け候補翌日 buy (cfs32) / 押し目指値 buy (cfs33)
-- 1 銘柄逐次を唯一の評価枠組みとすること / 複数ポート束ね (cfs40)
+- 正当価格 v4/v5 / H-alpha 系 / fantasy 系 / tp/sl logic / trail / stop loss
+- τ 軸 / H4e 系全体 / 逆張り平均回帰 (cfs15) / N 増路線 (cfs17) / ショート (cfs30)
+- 1 銘柄逐次を唯一の評価枠組み / 複数ポート束ね (cfs40)
 - K5 hold40 の 4.46x (cfs39) = 大化け喰いの幻
-- P1 への追加選別/利確 TP/TOPIX 地合い フィルタ (cfs42-44) = 全て mult 低下
-- P1 いじり/別系統/ML 大化け/ML ネット/財務の 5 方向 (cfs48-54) = 全て P1 超えず
-- Standard 課金 (ヨーク明確却下)
-- 「P1 に 10x の素無し」 断定 (cfs55→56 で撤回) = overclaim 禁止
-- P1 母集団での 16 ヶ月 10x 速度追求 (cfs58)
-- 広い母集団の素直な単軸識別 (cfs59)
+- P1 への追加選別/利確 TP/地合いフィルタ (cfs42-44) = 全て mult 低下
+- P1 いじり/別系統/ML/財務の 5 方向 (cfs48-54) = 全て P1 超えず
 - 手持ちデータでの広い母集団識別 (cfs60-61) = p≈0 で定量確定・再試行禁止
-- cfs68 モメンタム複利: mult_max=0.836x、 全件 P1 超えず棄却方向
-- **★ 2026-06-11 棄却 (cfs148-184 系統、 想像の天井)**:
-  - 複+大+左 2.91x (cfs148-184 系統): GBM 4 エンジン AND、 ARK が軸を決めて ぶつけた = CFS_DIRECTION 「想像の天井」 違反
-  - 複+左+神 3.64x (cfs172-173): 約定 15 薄、 厚くすると崩れる
-  - 出口 tp/sl (cfs165): 全 24 通り hold13 持ち切りに及ばず
-  - 予測精度の壁仮説 (cfs166-168): 真因は資金管理、 否定
-  - 新構成 大化け+勝率+神の目 (cfs171): 時期依存で却下
-  - 波の起点予測 (cfs176): 起点 0.08% 希少 0.80x
-  - 波乗り続け (cfs180): M2/M3 < M1 で却下
-- **★ 2026-06-12 棄却 (cfs140)**:
-  - 広域 pool × 出口 grid (768 sim): OOS mean_log>0 = 0/384。 godseye 実測出口 (tp0.66/sl-0.28/h13) は全 pool 0.03-0.12x 壊滅、 wr30-35%。 「出口単独の選別力」 棄却。 出口は選択がある場合のみ機能する増幅器
-  - 副産物: vola 降順 cap60 で pool 縮退 (all≡hivol、 lowpx≡lowpx_hivol = 実測は高ボラ尾部のみ)。 真の広域は cfs59 (0.71x) で確定済のため結論不変
+- cfs68 モメンタム複利 mult_max=0.836x 棄却方向
+- 複+大+左 2.91x (cfs148-184) = ARK 想像の天井
+- 出口単独の選別力 (cfs140) = OOS 0/384
+- **★ 2026-06-17 棄却 (仮説ロット ARK-1〜6、 FAILURE_LOG §4/§5.17)**:
+  - ARK-1 価格出来高入口 0.87x / ARK-2 信用買残正方向(中勝ち逆相関) / ARK-3 信用中庸1.04x単体上限(分散の素候補で生存記録)
+  - ARK-4 大化け×信用事前濃縮: 論点A=YES(普遍現象)/論点B=NO(0.86x MDD-41%)
+  - ARK-5 大化け事後捕捉: r+0.29%でr15%に桁違い不足
+  - ARK-6 P1回転加速: P1利益前半57%でhold短縮r落ち2.26x
 
 ---
 
 ## 5. 検証ログ (直近主要)
 
-### cfs140 (2026-06-12、 新 ARK 初検証) - **棄却**
-- 広域 pool (all/lowpx/hivol/lowpx_hivol) × 出口 grid (tp4×sl3×hold4) × alloc2 × train/test = 768 sim
-- test (2024-04〜2026-04) mean_log>0 = **0/384**。 godseye 実測点 tp0.66/sl-0.28/h13: 全 pool 0.03-0.12x、 wr29.7-35.1%
-- 構造解剖: 高ボラ尾部では 「ノイズで sl を踏み tp 前に hold 切れ」 の機械。 grid 勾配は hold40・tp 大・sl 深 = 持ち切り方向ほど回復 (top: lowpx/tp1.0/sl-0.40/h40 = 1.0989x、 ただし mean_log -0.055 の裾依存凸性、 edge でない)
-- 結論: 神の目 wr77.7% と現実 wr30% の差 +45pt = 選択の寄与。 道B の対象は 「選択の構造」 に絞られた
-- alloc 定義差 (free vs ncand): 候補 ≥ 枠で恒等 (diff 全 0)。 定義衝突は疎シグナル戦略でのみ決着可、 保留
-- 副記録: code4 int 読込で '132A' ValueError 1 回 → str 読込で即修正 (v4.3 §7 が正、 MANUAL §11 要改訂)
+### ARK-1〜7 (2026-06-17、 仮説ロット制、 cfs192-213) - **6棄却+ARK-7検証中**
+- 詳細は CFS_MAP.md (仮説ロット台帳) + FAILURE_LOG.md §4/§5.17 + lots/ARK-N_*.md。 各cfsの結論は CFS_INDEX 台帳に自動記録
+- ★最深構造: 大化けの率は濃縮できるが、 大化けと外れが同母集団に同居し平均rが10x水準(15%)に上がらない(§5.17)。 「10xは大化け牽引だが大化けは取れない」壁の正体を6角度から確定
+- ★cfs207: 10x解は大化け牽引(利益85%が上位5%)
+- ★cfs212: cfs77 sim関数を完全流用しP1=n390再現成功。 ARKの簡略再実装は3連続破綻(cfs210点灯全体/cfs211 cash簡略)→確定sim骨格を流用すべき(F-046実地)
+- ★cfs213: 空売り最多群=大化けリフト1.66x・外れの損下位5%-16.9%(非対称の前提苦しい、 ARK-7棄却寄りだが損切りsim未検証)
 
-### cfs148-184 (2026-06-06〜06-11、 cfs148 系統、 現任 ARK 期間) - **棄却**
-- 入口 = 複利 + 大化け + 左裾回避 各 GBM 上位 5% AND
-- 選択 = 神の目順、 等加重 daily_max=5、 K30 hold13 MIN_PER2 万
-- 実約定 中央 2.91x、 約定 69、 神の目率 2.2%、 6/6 分割>1.0x
-- ★ 前任 ARK 6/11 裁定: CFS_DIRECTION 違反 (ARK が軸を決めてぶつけた = 想像の天井 2-3x 壁)。 FAILURE_LOG 行き
-- ★ 確定畳み再評価で 7. 等加重 (各銘柄=総資産/K) が最大の効き発見 → 道B の文脈で再評価する 構造の学び は残す (HANDOVER_FULL 参照)
-
-### cfs68-90 (2026-06-05、 検証群)
-- cfs70_path_anatomy: 道B シミュレータ初稼働候補、 n=500 で mult_mean=14.2x/p90=18.5x
-- cfs74/75: 広い母集団 神の目天井 1488x 再確認 (overclaim 禁止、 実運用値でない)
-- cfs76: mult=9.86x (n=3) は n 不足、 公式 P1=3.09x (n389) を上書きしない
-- cfs77: P1 真値 3.084x 確認
-- cfs90: margin_sim mult_max=3.090x/mean=2.663x、 マージンでも P1 水準止まり
-- cfs68: モメンタム複利 mult_max=0.836x 棄却方向
+### cfs140 (2026-06-12) - **棄却**
+- 広域 pool × 出口 grid (768 sim)、 test mean_log>0 = 0/384。 出口単独に選別力なし。 勝ちは選択(入口)に宿る
 
 ### cfs60-61 (2026-06-04、 ★★★★★ 最終結論)
-- 手持ちデータ (価格/出来高/財務) では広い母集団の勝ち銘柄を事前識別できない
-- test 相関 0.033、 実効 p≈0、 test 16 ヶ月 0.74x
+- 手持ちデータ (価格/出来高/財務) では広い母集団の勝ち銘柄を事前識別できない (test相関0.033、 p≈0)
 
-### cfs58-59 (2026-06-04)
-- cfs58: 16 ヶ月換算で神の目 K1 でも 2.1x = P1 母集団は 16 ヶ月 10x 速度なし
-- cfs59: 広い母集団 (天井 1488x) は識別なしだと 0.71x
+### cfs55-59 (2026-06-04)
+- cfs55: P1母集団の神の目天井 K20=3.33x。 cfs58: 16ヶ月で神の目K1でも2.1x。 cfs59: 広い母集団は識別なし0.71x
 
-### cfs56-57 + BREAKER#002 (2026-06-04)
-- P1 母集団 K1 天井 16.97x、 境界 ±5% で天井 20-70x 激変、 3.33x は枠組みの性質
-- BREAKER#002 クローズ、 ARK overclaim 2 度阻止
+### cfs37-77 (P1確定)
+- 分散ポートフォリオでP1 K20hold40=3.09x確定 (過適合でない・地合い非依存)。 cfs77真値3.084x。 cfs45-47: P1源泉はペイオフ非対称
 
-### cfs55 (2026-06-04、 ★★★)
-- P1 母集団の神の目天井: K20 3.33x = P1 に 10x の素無し。 低位高ボラ (広い母集団) は K20 で 1488x
-
-### 過去検証 (要約)
-- cfs53-54: ML ネット回帰は test 相関 0.022 で符号予測不可、 財務軸は P1 に足すと右裾削れ mult 低下
-- cfs51-52: 別系統 edge は低相関だが弱い、 ML 大化け予測は test AUC0.677 だが収益化せず
-- cfs48-50: P1 大損除外で MDD 半減も 3.97x は過適合棄却 (cfs50: test 1.54x 低下)
-- cfs45-47: 逆算 (F-043) + BREAKER#001-2 確定、 P1 源泉はペイオフ非対称 (比 1.912/歪度 7.324)
-- cfs37-44: 分散ポートフォリオで檻突破、 P1 K20hold40 で 3.09x 確定 (過適合でない・地合い非依存)
-- cfs6-36: 単軸/交差/ローラー全て edge 無し or 1.141x 収束 (1 銘柄逐次の檻)
+### 過去検証 (要約、 詳細は HANDOVER_FULL)
+- cfs6-36: 単軸/交差/ローラー全て edge 無し or 1.141x 収束 (1銘柄逐次の檻)
+- cfs48-54: P1いじり/別系統/ML/財務の5方向全てP1超えず
+- cfs148-184: 複+大+左 2.91x、 ARK想像の天井で棄却
 
 ---
 
@@ -249,118 +201,104 @@ gap (23,129) / universe (20,813) / vol (12,381) / p1_dn (2,855) / ext (2,556)
 ## 7. 環境情報
 
 ### Python / 実行
-- Store 版 python、 作業 `C:\mnt\data\`、 実行 `cd C:\mnt\data; python run.py scripts\xxx.py`
+- Store 版 python、 作業 `C:\mnt\data\`、 実行 `cd C:\mnt\data; python run.py scripts\xxx.py` (自動git push)
 
 ### GitHub
-- private: github.com/CFS-york/project-cfs / public mirror: github.com/CFS-york/project-cfs-output
-- Actions: auto_handover (cron 23:59 JST、 2026-06-03 復旧 + 自己検知ループ)、 physics_check (push trigger)
+- private: github.com/CFS-york/project-cfs (master) / public mirror: github.com/CFS-york/project-cfs-output (main)
+- Actions: auto_handover (cron 23:59 JST)、 physics_check (push trigger)
 - ★ cron_status.json: mirror/ml_output/ に成否記録。 後任 ARK は起動時に読み cron 健全性を自己検知
-- ★ HANDOVER_FULL.md: mirror に全履歴版 (圧縮せず蓄積)。 詳細が要る時 web_fetch (CFS_MANUAL v2.4 §8.3 step5)
-- ★ push_to_mirror.py v3 (2026-06-11): token mask 化、 log/chat 流出防止
+- ★ HANDOVER_FULL.md: mirror に全履歴版。 詳細が要る時 web_fetch
+- ★ push_to_mirror.py v3.4: token mask 化 + lots\・DATA_MAP.md 同期対象
 
 ### J-Quants API V2
 - api.jquants.com/v2、 Light plan。 認証=API キー方式 (V2 で mail/pass 廃止)
-- API キーは `C:\mnt\data\.env` の JQUANTS_API_KEY で管理 (失効時はヨークが J-Quants ダッシュボードで再発行)
+- API キーは `C:\mnt\data\.env` の JQUANTS_API_KEY で管理 (失効時はヨークが再発行)
 - Light 取得可: 上場一覧/株価四本値/財務/決算発表予定日/取引カレンダー/投資部門別/TOPIX 四本値
-- Light 取得不可 (Standard〜、 ヨーク却下): 信用残/空売り残/業種別空売り比率等。 分足/TDnet はアドオン
+- Light 取得不可 (アドオン): 分足/TDnet。 ★ 信用残・空売りは既に cache 取得済 (margin_cache/shortsale_cache)
 
-### cache (削除禁止) `C:\mnt\data\cache\`
-- price: adjc/adjo/adjh/adjl/vol_cache_54m.csv (★ code4=**str**、 英字コード '132A' 含む。 int 読込は ValueError = 2026-06-12 実証。 CFS_MANUAL §11.2/11.5 旧記述は要改訂)
-- financial_cache.csv / h4e_scores_daily.csv / h4e_features_full.csv / investor_cache.csv
-- sector_master.csv / topix_cache.csv / clean_blacklist.csv (33 銘柄)
+### cache (削除禁止) `C:\mnt\data\cache\` (2026-06-17 現物確認)
+- 価格: adjc/adjo/adjh/adjl/vol_cache_54m.csv (★ code4=**str**、 英字コード '132A' 含む。 int 読込は ValueError)
+- 信用: margin_cache.csv (64MB、 long_vol/shrt_vol、 週次。 ARK-2/3/4で検証)
+- 空売り: shortsale_cache.csv (38MB、 short_to_so/short_shares/fund/disc_date、 不規則公表。 ARK-7で検証中)
+- ★未踏 (本sessionのARK未使用・正体未把握、 次ARK把握候補): h4e_features_full(264MB)/h4e_features_lag(417MB)/h4e_scores_daily(150MB)/h4e_scores_lag(149MB)/signal_all_full(286MB)
+- financial_cache / investor_cache(ほぼ空) / topix_cache / sector_master / clean_blacklist(33銘柄)
+- ★ 分足は無し(全て日足54mキャッシュ)
+- 原資: Results\ARK\cfs5\cfs148_dataset\dataset.parquet (450万行、 netfix=hold13固定/godseye_net40中勝ち/top1大化け/各_pct当日断面分位)
+
+### 確定sim (cfs_common.py、 自作禁止)
+- load_base(DATA,CACHE,CLEAN) → df/netfix/top1/t_arr/codes (地合いmerge強制)
+- sim_equal_weight(maskte,t_arr,netfix,codes,top1,sG_all,M=1) → (16m倍率,約定,勝率,神の目率,MDD)。 常時フルポジ K30 hold13 MIN_PER2万 DAILY_MAX5
+- ★ARKの簡略再実装は破綻(cfs210/211)。 P1再現等は cfs77_p1_true.py のsim関数を完全流用(cfs212で実証)
 
 ### 物理コスト
 - COST=0.005、 TAX=0.20315、 BASE_SPREAD=0.0005、 SLIP_CAP=0.10
 
 ### blacklist
-- ORIGINAL_BLACKLIST 14 銘柄 + cfs21 新規 19 銘柄 = **拡張 BLACKLIST 33 銘柄**
-- 33 銘柄: 1364,1568,1579,1629,1689,1949,2164,2237,2238,2553,2593,2629,2840,2841,3961,4957,5074,5076,5721,6406,6628,6731,7116,7172,7176,7718,7946,8227,8256,9264,9318,9434,9600
+- 拡張 BLACKLIST 33 銘柄 (clean_blacklist.csv): 1364,1568,1579,1629,1689,1949,2164,2237,2238,2553,2593,2629,2840,2841,3961,4957,5074,5076,5721,6406,6628,6731,7116,7172,7176,7718,7946,8227,8256,9264,9318,9434,9600
 
-### ファイル2 構成 (2026-06-11 整理後、 active 11 file)
-- CFS_RULES.md、 ARK_DISCIPLINE.md、 CFS_MANUAL.md
-- HANDOVER_LATEST.md、 HANDOVER_FULL.md、 FAILURE_LOG.md
-- CFS_MAP.md、 CFS_DIRECTION.md、 ARK_PHILOSOPHY.md (大方針 3 file、 2026-06-04+)
-- P1_DEFINITION.md、 SETUP_PHASE1.md
-- archive\: cfs138-184.md 46 個 (過去検証メモ、 履歴保存、 mirror 同期対象外)
+### ファイル2 構成
+- 核: CFS_RULES / ARK_DISCIPLINE(v1.8) / CFS_MANUAL / HANDOVER_LATEST / HANDOVER_FULL / FAILURE_LOG(v2.2) / CFS_MAP / CFS_DIRECTION / ARK_PHILOSOPHY / DATA_MAP / P1_DEFINITION / SETUP_PHASE1
+- lots\: ARK-1_CFS-FANTASY / ARK-2_MARGIN / ARK-3_MARGIN-MID (仮説ロット詳細)
+- archive\: cfs138-184.md 等 過去検証メモ
 
-### scripts/ (生存 path) + ARK_LOOP 構成 file (2026-06-12 新設/改修、 削除禁止)
-- cfs_common.py: 確証済み実装 単一 source (load_base、 net_of、 engines、 base_ML、 sim_equal_weight)
-- ★ ただし cfs_common 内の base_ML は複+大+左 系統 (棄却対象)、 道B 文脈で再評価
-- run.py **v3** (2026-06-12): M1 SESSION_GATE + M3 PROBE/寿命 (25 run/2 strike) + M4 テーマ再注入 + selftest/newchat subcommand
-- ark_guard.py **v3** (2026-06-12): v2 WARN 裁定維持 + STOP-A (cache int 読込) + STOP-B (棄却軸 token + DIFF 宣言なし) + scan_text() 公開
-- ml/failure_keywords.json (2026-06-12 新設): 棄却軸検知 token 辞書。 棄却確定の度に ARK が全文更新 → ヨーク上書き
-- ml/session_state.json (run.py v3 が自動生成・自動更新): run_count / strikes / rotate / awaiting_session_check。 手動編集不要、 chat 切替時 `python run.py newchat` で reset
+### scripts/ + ARK_LOOP 構成 file (削除禁止)
+- cfs_common.py: 確証済み実装 単一source (load_base、 sim_equal_weight 等)。 ★base_MLは複+大+左系統(棄却)、 道B文脈で再評価
+- run.py v3 (M1 SESSION_GATE + M3 PROBE/寿命25run2strike + M4テーマ再注入 + selftest/newchat)
+- ark_guard.py v3 (WARN裁定 + STOP-A cache int読込 + STOP-B 棄却軸token)
+- ml/failure_keywords.json (棄却軸検知token辞書)、 ml/session_state.json (run_count/strikes/rotate 自動更新)
+- scripts\derive\: ARK-3導出ロジック退避
 
 ---
 
 ## 8. 次セッション ARK へ
 
 ### 必読順序
-1. CFS_RULES.md → 2. ARK_DISCIPLINE.md → 3. 本 HANDOVER_LATEST → 4. FAILURE_LOG.md → 5. CFS_MANUAL.md → 6. HANDOVER_FULL.md (詳細時)
+1. CFS_RULES → 2. ARK_DISCIPLINE → 3. 本HANDOVER_LATEST → 4. FAILURE_LOG → 5. ★★CFS_MAP(仮説の定義/立て方/意味・ロット台帳) → 6. CFS_MANUAL → 7. HANDOVER_FULL(詳細時)
 
-### ★ 起動時必須 (§8.3 v2.5、 2026-06-11 強化)
-1. mirror の ml_output/cron_status.json を確認。 result=failed や連続失敗ならcron 修理を最優先
-2. ★ 自己テスト (理解確認): 現在地 mult / 直近棄却軸 / cron_status.json result を即答できる か
-3. 答えられない → 該当 file 再読 強制
-4. 「読んだ」 ≠ 「理解した」 の境界 を自覚
+### ★ 起動時必須 (§8.3)
+1. cron_status.json確認 (failed/連続失敗ならcron修理優先)
+2. ★ 自己テスト即答: 現在地mult(P1=3.09x) / 直近棄却軸(ARK-1〜6) / cron result / 次最優先タスク
+3. 答えられない → 該当 file 再読強制。 「読んだ」≠「理解した」の境界を自覚
+
+### ★★ 2026-06-17 最重要の引き継ぎ (本sessionのARKがヨークに鍛えられた核心)
+- **仮説の意味**: 仮説は「10xの式 (1+r)^N=10 が成り立つ世界をどう実現させようとするか」の言語化。 保証・確信を求めるな。 確信を求めると壁打ちに堕ちる
+- **仮説の立て方**: ①過去データ現物で土台固め→②確信なく大胆に(A〜E)で立てる→③検証で殺す。 外れていい、 立てて殺すことが思考拡張
+- **10x方程式必須**: 仮説ブロックは必ず (1+r)^N=10 でr・Nを置きARKが自分で検算。 rを逆算して10xに見せるのは循環論法=禁止、 rが取れる実現の言語化が本体
+- **壁打ちの罠**: 「効くか試す」測定は安全だから油断すると戻る。 「確かめてから立てる」「材料が揃ってから」は永遠に立てない=永遠に壁打ち
+- **ARKの病(self監視)**: ①数字にも指摘にも流される ②勝手に区切る・諦める・終わらせる(権限はヨーク) ③忖度で「どうしますか」と聞く(ターンの無駄) ④「精度落ちたから次へ」は逃げ。 本sessionでヨークに繰り返し正された。 次ARKも同じ病を持つ
+- **F-046実地**: ARKの簡略再実装は破綻(P1再現3連続失敗)。 確定sim骨格(cfs77等)を完全流用せよ
 
 ### 大事な認識
-- ARK は記憶なし・学習しない・検証実行できない。 「思考 + 仮説 + 規律遵守」 が役割
-- ヨークは 検証 trigger + 承認 + ストップ役。 ★ ヨークはデータ・file を直接触らない。 HANDOVER 更新は ARK が **全文** を出し、 ヨークが上書き保存する ([HANDOVER ADD] 部分貼付け形式は 2026-06-12 廃止)
-- LightGBM = 機械学習 (数値計算)、 Claude API = 文章整理 のみ (役割完全分離)
-- mirror = ARK 参照先 (起動時必読)、 PC ローカル = ヨーク 編集場所
-- watcher = PC ⇔ GitHub 同期 自動化 (30 秒以内、 v2.4 encoding 修正済)
-- cron 23:59 = 文章整理 + mirror 反映 自動化 (6/03 修正版、 マーカー区切り、 max_tokens 16000)
+- ARKは記憶なし・学習しない・検証実行できない。 「思考+仮説+規律遵守」が役割
+- ヨークは検証trigger+承認+ストップ役。 ★ データ・fileを直接触らない。 HANDOVER更新はARKが**全文**を出しヨークが上書き保存
+- mirror = ARK参照先(起動時必読)、 PCローカル = ヨーク編集場所、 watcher = 自動同期、 cron 23:59 = 文章整理+mirror反映自動化
 
 ### 警告 (失敗から)
 - ML report 高 mult cell は物理検証必須 (7.43x→0.40x の前例)
-- ★ 新規 edge 候補は 「横断平均 net」 で判断せず必ず確定畳み複利 sim (N111/1.141x assert) で最終判定 (cfs28)
-- sim 実装は検証済骨格 (sig_t 基準 accept) を流用。 新規実装は assert 強制 + 最小ケース検証
-- 「天井」 「不可能」 「構造的」 は data で証明するまで使用禁止 (規律 3)
-- ヨークに撤退提案 NG。 セッション終了を ARK から提案しない
-- 配置 flow は最初から完全提示、 後出し NG。 cmd は ; 区切り 1 行統合
-- system 修正は実ファイル確認後 (log 推定診断 NG、 F-040)
-- ★ overclaim 禁止: 神の目数字の上限誤用・特定運用の天井を母集団の天井とすり替え禁止 (BREAKER#002 で 2 度阻止)
-- ★ 道A (パラメータ総当たり) は過適合製造機で禁止。 道B (10x 解の共通構造発見) が次の本筋
-- ★ cfs76 の mult=9.86x (n=3) は n 不足で公式 P1=3.09x (n389) を上書きしない。 小サンプルの数値で方針転換するな
-- ★ cache 読込は code4=str (2026-06-12)。 MANUAL §11 の旧 int 記述を引かない
-- **★ 2026-06-11 追加教訓 (現任 ARK 規律違反 系譜から)**:
-  - 「読んだ」 ≠ 「理解した」: fetch しただけ で動くと規律違反累積 → ポンコツ化
-  - 「court」 等 自動付加 token を 出力に混ぜない (言語崩壊 防止)
-  - 「後で対応」 「次セッションで」 提案は永久にやらない 規律違反、 即対応
-  - ヨークに 「どっち?」 「どうしますか?」 反復確認 = 媚び、 ARK 単独判断
-  - 別系統 edge 候補を 「現在地」 と引き継がない (cfs148-184 複+大+左 は棄却済、 P1=3.09x が公式)
-  - CURRENT_FOCUS.md 等の 二重 file を新設しない、 既存 file の該当 section を更新
-- **★ 2026-06-12 追加 (F-050 提案、 ヨーク指示由来)**:
-  - **file 新規追加 / system 変更 をしたら、 指示・指摘を待たず同 turn 内で 文書更新 (HANDOVER 等) 全文を出す**。 漏れ = 引継ぎ断絶。 本 v4.5 がその初適用
-  - ARK_LOOP 運用: 毎 script header に ARK_PROBE_ANS 2 行 (公式 mult / 最優先) を記載。 newchat 直後の初 script は ARK_SESSION_CHECK も必須。 [ARK_ROTATE] が出たら HANDOVER 全文更新 → 新 chat → `python run.py newchat`
+- ★ 新規 edge 候補は必ず確定畳み複利 sim で最終判定 (横断平均netで判断しない)
+- 「天井」「不可能」「構造的」は data で証明するまで使用禁止 (規律 3)。 ただし§5.17は6角度の検証で確定済
+- ★ ヨークに撤退提案・セッション終了提案 NG。 区切る権限はヨークのみ (本sessionで繰り返し違反、 厳守)
+- 配置 flow は最初から完全提示・後出しNG。 cmd は ; 区切り 1 行統合。 script承認後は同turnでpresent再提示
+- ★ overclaim 禁止 (BREAKER#002 で 2 度阻止)
+- ★ 道A (パラメータ総当たり) 禁止。 道B (10x解の共通構造発見) が本筋
+- ★ cache 読込は code4=str。 簡略sim再実装は破綻、 確定骨格流用
+- ★ 「後で対応」「次セッションで」提案は規律違反、 即対応。 ヨークに反復確認(媚び)せず単独判断
+- ★ file 新規追加/system変更したら同turn内で文書更新全文を出す(F-050/F-051)
 
-### 現在の最重要タスク
-1. **道B シミュレータ深化 (最優先)**: cfs70 の n=500 10x 解から **選択の構造** を解析 (行動=出口は cfs140 で消去済)。 BREAKER に通す。 道A 禁止
-2. **cfs90_margin_sim 詳細確認**: マージン活用で P1 を超えられるか
-3. **新情報軸 (信用残/空売り/分足)**: cfs61 で識別精度限界確定、 J-Quants 拡張の戦略判断 (ヨーク)
-4. **P1 境界が谷である理由**: 隠れた選択バイアス、 3.09x の頑健性に関わる
+### 現在の最重要タスク (§3再掲)
+1. ARK-7空売りの決着(損切りでl限定の確定sim) 2. h4e/signal_all把握(未踏最有力) 3. 大化けと外れの分離別原理 4. ARK-3分散の素
 
 ---
 
-## 改訂履歴 (直近10版)
+## 改訂履歴 (直近)
 
-- 2026-06-04 v3.7 cfs55 (理想天井): P1 母集団天井 K20=3.33x
-- 2026-06-04 v3.8 cfs56-57 + BREAKER#002: 「P1 に 10x の素無し」 撤回 (K1 天井 16.97x)、 ARK overclaim 阻止
-- 2026-06-04 v3.9 cfs58-59: 識別精度トレードオフ発見
-- 2026-06-04 v4.0 cfs60-61 (最終結論): 実 ML test 相関 0.033 = 実効 p≈0
-- 2026-06-05 v4.1 cfs68-90 反映: 道B シミュレータ 初稼働候補 (cfs70/n=500)、 cfs68 棄却方向、 cfs90 マージン詳細要確認
-- 2026-06-11 v4.2 前任 ARK 代行整理: ファイル2 整理、 CURRENT_FOCUS 廃止、 複+大+左 棄却、 push_to_mirror v3、 起動時自己テスト必須化、 公式現在地 P1=3.09x 維持
-- 2026-06-11 v4.3 前任 ARK 代行整理 完遂: ark_guard v2 警告化、 run.py v2、 push_to_mirror v3.1、 CFS_MANUAL v2.5.1、 全代行 path 完遂
-- **2026-06-12 v4.4 新 ARK 引継ぎ完了 + cfs140 反映**:
-  - 新 ARK 引継ぎテスト 8/8 通過、 前任 ARK 撤収 (F-049 領域境界遵守)
-  - cfs140 棄却: 広域 pool × 出口 grid、 OOS mean_log>0 = 0/384。 「出口単独の選別力」 棄却、 選択の寄与 +45pt 定量確認 → 道B の対象を 「選択の構造」 に絞り込み
-  - alloc 定義 (free vs ncand) は候補≥枠で恒等と実証、 定義衝突は疎シグナル戦略で決着、 保留
-  - code4=str 確定 (int 読込 ValueError 実証)、 CFS_MANUAL §11 要改訂を §1/§7 に明記
-  - HANDOVER 更新方式: [HANDOVER ADD] 部分貼付け廃止 → ARK 全文出力 + ヨーク上書き保存 に統一
-  - mirror CDN キャッシュ実例 (13 日前の版) を §0 鉄則に追記
-- **2026-06-12 v4.5 ARK_LOOP v1 実装**:
-  - run.py v3 + ark_guard.py v3 + ml/failure_keywords.json 配置、 selftest T1-T4 ALL PASS (強制力の機械証明)
-  - 後任 ARK 崩壊 3 層への層別物理対策 (M1-M4)、 ARK 自己制御依存ゼロ、 ヨーク新規操作 = newchat 1 cmd のみ
-  - F-050 提案 (file 追加/system 変更 = 同 turn 文書更新、 指示前対応) を §8 に記載、 本版が初適用
-  - 次: CFS_MANUAL v2.6 改訂 (v2.5.1 原文受領後) → 道B (cfs70 選択構造解剖) 復帰
+- 2026-06-11 v4.2 ファイル2整理、 CURRENT_FOCUS廃止、 複+大+左棄却
+- 2026-06-11 v4.3 ark_guard v2警告化、 run.py v2、 CFS_MANUAL v2.5.1
+- 2026-06-12 v4.4 新ARK引継ぎ + cfs140反映 (出口単独の選別力棄却、 選択の寄与+45pt)
+- 2026-06-12 v4.5 ARK_LOOP v1実装 (run.py v3 + ark_guard v3 + failure_keywords.json)
+- **2026-06-17 v4.6 ARK-1〜7完遂で大化けの壁を6角度確定 + 仮説の定義/立て方/意味/10x方程式確立**:
+  - 仮説ロット制ARK-1〜6棄却(ARK-7検証中)。 10xは大化け牽引(cfs207)だが大化けと外れが同母集団に同居し平均rが15%に届かない(§5.17)=壁の最も一般化された姿を6角度から確定
+  - 仮説の定義(A〜E)・立て方(確信なく立てる/データ確認は土台)・意味(10xの式を実現させようとする言語化)・10x方程式(1+r)^N=10必須 をCFS_MAPに策定
+  - 引き継ぎ整備: lots\・DATA_MAP・ARK_DISCIPLINE v1.8(F-051)・FAILURE_LOG v2.2・push_to_mirror v3.4
+  - cache現物確認: 分足無し、 h4e/signal_all(計約1.3GB)が未踏で次候補
+  - ★ARKの病(流される/勝手に区切る/忖度/逃げ)をヨークに繰り返し正された記録を§8に明記、 次ARKへの最重要引き継ぎ
