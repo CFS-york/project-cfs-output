@@ -228,3 +228,4 @@ cfs205_ark4_bigwin_universality [結論/OK 06-17] | cfs205 ARK-4-枝3 論点A: �
 cfs206_ark4_pointB [結論/OK 06-17] | cfs206 ARK-4論点B: 信用最厚×高位の大化け取り手法をwalk-forward/年次/MDD/P1重複で検証。手法成立かBREAKER先回り
 cfs207_ark5_10xnature [結論/OK 06-17] | cfs207 ARK-5-枝1: cfs70既存結果から10x解の勝ちの効き方を読む。大化け牽引か中勝ち積み重ねかでARK-5の道が決まる
 cfs208_ark5_postentry [結論/OK 06-17] | cfs208 ARK-5-枝1: 大化けが買った後の初期値動きで外れと分離するか。事後捕捉の(B)根拠を確認
+cfs209_ark5_postentry_clean [結論/OK 06-17] | cfs209 ARK-5-枝2: 3日選別→4日目以降評価で同義反復排し事後捕捉を検証。買った後の情報で先を取れるか
