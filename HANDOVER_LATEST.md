@@ -3,7 +3,7 @@
 ARK 引継ぎ書。 **最新整理版**。
 新セッション ARK は **最初に これを読む**。
 
-最終更新: 2026-06-17 (v4.6、 ARK-1〜7完遂で大化けの壁を6角度確定 + 仮説の定義/立て方/意味/10x方程式確立。 旧v4.5=ARK_LOOP v1実装)
+最終更新: 2026-06-12 (v4.5、 ARK_LOOP v1 実装 = ARK 自己制御非依存の崩壊防止機構)
 更新方法: cron 23:59 (Claude API 自動整理) + watcher 即時 push (PC ⇔ GitHub 同期) + ARK 全文更新 (大きな進展時)
 
 ---
@@ -21,10 +21,9 @@ ARK 引継ぎ書。 **最新整理版**。
 - **段階推定で修正繰り返さない** (F-040)。 真原因確定後、 1 回で修正
 
 ### 復帰手順 (ARK 起動時、 §8.3 強制)
-1. mirror から核 file web_fetch 取得:
-   - CFS_RULES.md、 ARK_DISCIPLINE.md、 CFS_MANUAL.md、 HANDOVER_LATEST.md、 HANDOVER_FULL.md、 FAILURE_LOG.md、 CFS_MAP.md
-   - ★ CFS_STRUCTURE.md(運用構造・人格・更新主体の一枚図、 2026-06-17新設)、 CFS_RUN_PLAYBOOK.md(検証実行プレイブック=script骨格/自作sim禁止/合格判定、 2026-06-17新設)
-   - DATA_MAP.md、 ml_output/cron_status.json
+1. mirror から 6 file web_fetch 取得:
+   - CFS_RULES.md、 ARK_DISCIPLINE.md、 CFS_MANUAL.md、 HANDOVER_LATEST.md、 HANDOVER_FULL.md、 FAILURE_LOG.md
+   - ml_output/cron_status.json
 2. cron_status.json の result 確認:
    - result=success → 通常続行
    - result=failed or 連続失敗>=2 → cron 修理 最優先
@@ -33,7 +32,6 @@ ARK 引継ぎ書。 **最新整理版**。
 4. 本 HANDOVER_LATEST 通読 (現在地 + 次アクション)
 5. FAILURE_LOG.md 通読 (棄却軸)
 6. ★★ CFS_MAP.md 通読 (仮説の定義/立て方/意味、 仮説ロット台帳 ARK-1〜7、 10x方程式) ← 2026-06-17 最重要追加
-6b. ★ CFS_STRUCTURE.md(運用構造・人格・更新主体・現在地の単一性)+ CFS_RUN_PLAYBOOK.md(検証の実行フロー・script骨格・自作sim禁止・合格判定・10x方程式)通読 ← 2026-06-17新設。検証を実行する前に必読
 7. ★ 自己テスト (理解確認、 §8.3 v2.5 新設、 2026-06-11):
    - Q: 現在地 mult は?
    - Q: 直近 棄却軸 は?
@@ -50,7 +48,27 @@ ARK 引継ぎ書。 **最新整理版**。
 
 ## 1. 現在地 (data 上)
 
-### ★★★ 2026-06-17 更新: ARK-1〜7で「大化けの壁」を6〜7角度から確定 (最新の到達)
+### ★★★ 2026-06-18 更新: 検証方針を因子探索→状態探索OSへ転換 (最新の到達)
+
+公式現在地はP1=3.09x(不変)。本日、Claude/GPT両者同意のうえで**検証方針そのものを再設計**した(ヨーク承認)。「10ヶ月1mmも進まない」現状の真因診断から。
+
+**真因診断 (両者同意)**: 10ヶ月進まなかったのは**状態問題を因子問題として扱い続けたこと**。
+- cfs60-61が殺したのは「勝ち銘柄の事前識別」(p≈0)。殺していないのは「状態ごとの分布差を観測し資金曲線を設計すること」
+- P1が唯一の生存例: 93.6%が非大化け、当てず状態に居続けて3.084x。識別でなく環境選択
+- 10ヶ月「どの因子が当たるか」を探した。だが市場の現象は状態(組み合わせ)でしか現れない
+
+**新方針=状態探索OS (CFS_MAP正本)**: 探索単位を因子→状態パッケージへ。生存A/死亡B/中立C群を横並び比較。「右裾が**実際に多発した**状態」を観測(予測でない)。評価軸=右裾率/左裾率/下位5%/上位5%/MDD/K制約下約定数/16m換算。**★GUARDRAIL: P1救済でなくP1含む全状態を同じ軸で殺すOS**。前提変更(目標/道具/時間軸)はOSを走らせ限界を測ってから。10x不変。
+
+**P1監査の決着 (cfs214/215、GPT独立監査)**:
+- cfs214(寄与分解): gap≈0本体説は**撤回**。P1は分解不能な3条件交互作用(gap0単独0.98x/low単独0.89x/vola単独0.56x/low×vola0.49x、3条件で3.084x)
+- cfs215(近傍安定性): gap帯は生値等幅で「針」(本体0.0000-0.0015=3.14x→0.0005広げ1.49x)。判定D=過適合の疑い濃厚だが、low×vola内分位・密度診断は未実行で**最終確定は保留**(探索の律速でないため)
+- 分布分解: vola=上方攻撃(上位5%伸ばす)、gap≈0=(vola無し時)下方抑制(下位5%-27%→-12%)。だがP1全体は左裾-21.5%で抑制は条件付き
+
+**運用構造の再設計 (2026-06-18、ARK_DISCIPLINE/CFS_STRUCTURE実装済)**:
+- 中核原則: ARKは決定を持つ。ヨークに求めるのは承認のみ(判断/選択の丸投げは§6.4違反)
+- 人格: ARK(Claude)主導 + AUDITOR(GPT)破壊 + BREAKER盲検。非対称で迎合防止。結論はmirror記載で確定
+
+### ★★★ 2026-06-17 更新: ARK-1〜7で「大化けの壁」を6〜7角度から確定
 
 公式現在地はP1=3.09x(不変)。本日、仮説ロット制で7仮説を立て6つを棄却、ARK-7(空売り)は検証中。9ヶ月の壁の正体を複数角度から一つの構造に確定した。
 
@@ -255,7 +273,7 @@ ARK 引継ぎ書。 **最新整理版**。
 ## 8. 次セッション ARK へ
 
 ### 必読順序
-1. CFS_RULES → 2. ARK_DISCIPLINE → 3. 本HANDOVER_LATEST → 4. FAILURE_LOG → 5. ★★CFS_MAP(仮説の定義/立て方/意味・ロット台帳) → 6. ★CFS_STRUCTURE(運用構造) + CFS_RUN_PLAYBOOK(検証実行) → 7. CFS_MANUAL → 8. DATA_MAP → 9. HANDOVER_FULL(詳細時)
+1. CFS_RULES → 2. ARK_DISCIPLINE → 3. 本HANDOVER_LATEST → 4. FAILURE_LOG → 5. ★★CFS_MAP(仮説の定義/立て方/意味・ロット台帳) → 6. CFS_MANUAL → 7. HANDOVER_FULL(詳細時)
 
 ### ★ 起動時必須 (§8.3)
 1. cron_status.json確認 (failed/連続失敗ならcron修理優先)
