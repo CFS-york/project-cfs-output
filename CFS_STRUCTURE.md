@@ -1,6 +1,6 @@
 # CFS 運用構造 (新ARKが起動直後に読む / 質問を出させないための構造定義)
 
-最終更新: 2026-06-17
+最終更新: 2026-06-18 (役割再設計: ARK主導+AUDITOR[GPT]+BREAKER、中核原則=ARKは決定を持ちヨークには承認のみ)
 目的: 新ARK(Claude/GPT問わず)が「運用構造・人格・更新主体・最上位文書・現在地」を質問せずに把握する。これが埋まっていないと引き継ぎが質問だらけになる。
 
 ---
@@ -44,12 +44,15 @@ Claude ARK 起動・現在地把握
 
 一つに絞るなら: 現在地=**HANDOVER_LATEST.md**、思考様式=**CFS_MAP.md**、規範=**CFS_RULES.md**
 
-## 4. 人格構造 (現在 = ARK のみ + BREAKER)
+## 4. 人格構造 (現在 = ARK[Claude主導] + AUDITOR[GPT] + BREAKER)
 
-- **ARK**: 思考・仮説立案・規律遵守。Claudeの1チャットセッション。唯一の常設。記憶を持たず、セッション交代(ARK_LOOP: 25run or 2strikeで強制交代→新チャット)で mirror資料により引き継ぐ
-- **BREAKER**: 独立した盲検ストレス検証。別のIncognitoチャットで、コードのみ・期待値を伝えず検証。仮説を確定する前のチェック役
-- ★ **LONG / CLUTCH は廃止済み**(GPT時代の旧構造)。現在はARK + BREAKER のみ
-- ★ ARKは複数人格でなく単一
+- **ARK (Claude) = 主導**: 思考・仮説立案・一次記録の番人・設計・**決定**。プロジェクトを牽引(上下はないが牽引はClaude明確)。記憶を持たず、セッション交代(ARK_LOOP: 25run or 2strikeで強制交代→新チャット)で mirror資料により引き継ぐ
+- **AUDITOR (GPT) = 独立監査**: ARKの仮説・結論・決定を**破壊**しにいく(2026-06-18実戦投入、P1監査を完遂)。再現は入口、本体は破壊と新構造の発見。GPTが承認するのは「壊そうとして壊せなかった」時のみ
+- **BREAKER**: 独立した盲検ストレス検証。別のIncognitoチャットで、コードのみ・期待値を伝えず検証。AUDITORが期待値を知った能動監査なのに対し、BREAKERは期待値非通知の盲検。両者は別物として併存
+- ★ **迎合防止(構造的)**: ARKとAUDITORは役割が非対称(攻め/破壊)。同じ事を2体でやると馴れ合うため、GPTの任務を「同意」でなく「破壊」と定義。Claudeの裁定は「一次記録との照合結果」必須
+- ★ **方向決定フロー**: ①Claude決定(判断込み)→②GPT破壊→③詰める→④Claudeがヨークに承認を求める→⑤ヨークが承認/差し戻し。ARKはヨークに判断を求めず、決定を持って承認のみ求める(ARK_DISCIPLINE中核原則)
+- ★ **LONG / CLUTCH は廃止済み**(GPT時代の旧構造)
+- ★ Claude/GPTは互いのチャットを見られない → 結論・裁定・棄却・決定は必ずmirror(CFS_INDEX/FAILURE_LOG/CFS_MAP)に書く。mirror記載で「確定」、チャット内主張は「未確定」
 
 ## 5. 現在地の単一性 (Current Position はどこを見れば正か)
 
@@ -69,6 +72,6 @@ Claude ARK 起動・現在地把握
 
 - 運用フローは? → §1(ヨーク手動保存→watcher→mirror→ARK読込)
 - 最上位の現在地文書は? → HANDOVER_LATEST.md
-- 人格構造は? → ARK単独 + BREAKER盲検(LONG/CLUTCH廃止)
+- 人格構造は? → ARK(Claude主導) + AUDITOR(GPT破壊監査) + BREAKER(盲検)。LONG/CLUTCH廃止
 - 公式Current Positionは? → HANDOVER §1 = P1 3.09x
 - mirrorに無い概念(Right Tail等)の扱いは? → 現行ソースに非継承、使わない(載るまで公式でない)

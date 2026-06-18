@@ -233,3 +233,12 @@ cfs210_ark6_timestructure [結論/OK 06-17] | cfs210 ARK-6-枝1: P1利益の時�
 cfs211_ark6_p1_realtimestructure [結論/OK 06-17] | cfs211 ARK-6-枝2: P1約定銘柄(per=cash/free)の保有中リターンカーブ。利益が前半に乗るか時間構造を見る
 cfs212_ark6_p1_timestructure_fixed [結論/OK 06-17] | cfs212 ARK-6-枝3: cfs77完全流用でP1約定銘柄の時間構造。n389再現を確認し利益が前半に乗るか判定
 cfs213_ark7_shortsale [結論/OK 06-17] | cfs213 ARK-7-枝1: 空売り比率で大化けと外れが分離するか。信用買残と別の需給軸で§5.17の壁を破れるか
+gpt_p1_audit_v4 [結論/OK 06-18] | P1独立監査v2: dataset.parquet上でgap条件依存・gap帯比較・期間分割をnetfix機会損益で検証する。
+gpt_p1_ops_audit_v1 [結論/OK 06-18] | P1運用側監査v1: P1入口条件を固定しK/holdを振って、P1の3.09xが運用構造依存かを検証する。
+gpt_p1_core_audit_v1 [結論/FAILED 06-18] | P1本体sim監査v1: cfs77型simでP1を再現し、K/hold/期間/gap依存を破壊監査する。
+gpt_p1_core_audit_v2 [結論/OK 06-18] | P1本体sim監査v2: cfs77型simでP1を再現し、K/hold/gap/期間依存を破壊監査する。
+gpt_p1_core_audit_v3 [結論/OK 06-18] | P1本体sim監査v3: clean_blacklist正規除外でcfs77型P1を再現し、K/hold/gap/期間依存を破壊監査する。
+gpt_p1_destroy_audit_v4 [結論/OK 06-18] | P1破壊監査v4: rolling quantile・leave-year-out・yearly split・gap widthでP1の先読み/年依存/一点針を検証する。
+gpt_p1_destroy_audit_v5_fast [結論/OK 06-18] | P1破壊監査v5_fast: rolling step-window感度とgap中心/幅スイープでlook-ahead依存とgap一点針を検証する。
+gpt_p1_destroy_audit_v6 [結論/OK 06-18] | P1破壊監査v6: rolling504 step21とgap近傍帯比較でlook-ahead依存/gap一点針疑惑を精密検証する。
+gpt_p1_destroy_audit_v7 [結論/OK 06-18] | P1破壊監査v7: gap_only_rolling / pxvol_only_rolling / gap_fixed_width / posthoc_gap_structure でClaude差し戻しを検証する。
