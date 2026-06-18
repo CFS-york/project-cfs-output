@@ -244,3 +244,5 @@ gpt_p1_destroy_audit_v6 [結論/OK 06-18] | P1破壊監査v6: rolling504 step21�
 gpt_p1_destroy_audit_v7 [結論/OK 06-18] | P1破壊監査v7: gap_only_rolling / pxvol_only_rolling / gap_fixed_width / posthoc_gap_structure でClaude差し戻しを検証する。
 cfs214_p1_contribution [結論/OK 06-18] | cfs214: P1の7条件寄与分解。gap≈0が独立因子かlow×volaの副産物か、限界寄与(⑥→⑦)と大化け率/平均で判定
 cfs215_p1_judgeD [結論/OK 06-18] | cfs215: 判定D決着試行。gap帯近傍安定性(丘=構造/針=過適合)と分布分解(下位5%で下方抑制、上位5%/勝率で防御攻撃識別)でGPT破壊①②③に答える
+cfs216_p1_judgeD_final [結論/OK 06-18] | cfs216: 判定D最終確定の4層(全母集団分位/low×vola内分位/生値/密度K診断)。P1のgap帯が針か頑健な状態かをARKが確証しGPTにぶつける
+cfs217_p1_judgeD_equalmass [結論/OK 06-18] | cfs217: 判定D学術確定。等確率帯スイープ+gap分布可視化で針(過適合)か密集をまたいだ見かけか分離。0近傍だけ突出なら過適合確定→P1棄却
