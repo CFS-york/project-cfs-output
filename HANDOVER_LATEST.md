@@ -327,3 +327,9 @@ P1を過適合確定で棄却(判定D=GUILTY)。検証方針を因子探索→�
   - 引き継ぎ整備: lots\・DATA_MAP・ARK_DISCIPLINE v1.8(F-051)・FAILURE_LOG v2.2・push_to_mirror v3.4
   - cache現物確認: 分足無し、 h4e/signal_all(計約1.3GB)が未踏で次候補
   - ★ARKの病(流される/勝手に区切る/忖度/逃げ)をヨークに繰り返し正された記録を§8に明記、 次ARKへの最重要引き継ぎ
+
+<!-- watcher����e�X�g 2026-06-19 -->
+
+<!-- watcher v2.6 ����e�X�g 2026-06-19 -->
+
+<!-- watcher v2.6 ����e�X�g 2026-06-19 -->
