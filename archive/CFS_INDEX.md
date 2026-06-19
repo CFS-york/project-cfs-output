@@ -254,3 +254,7 @@ cfs222_residual_axes [結論/OK 06-18] | cfs222[LOT-G1]: 右裾残差の軸分�
 cfs223_pricegap_curve [結論/OK 06-19] | cfs223[LOT-H1]: price+gap右裾地形を資金曲線(cfs77 sim完全流用)で回し10x方程式接続を検証。全母集団/vola単独/price単独/price+gapを平均rと下位5%損で比較。左裾独立ならprice+gapの下位5%損が浅く平均rが薄まらないはず。接続で採用候補、非接続でcfs207壁の再来=手持ち限界
 cfs224_pricegap_curve_fix [結論/OK 06-19] | cfs224[LOT-H1]: cfs223のgap帯欠陥(P1針帯)を修正。price条件付き母集団内のgap分位を複数帯スイープし資金曲線。最良price+gap帯が10x方程式接続なら採用候補、全帯非接続ならcfs207壁の再来=手持ち限界
 cfs225_lot_h1_close [結論/OK 06-19] | cfs225[LOT-H1]: 3本柱(A利益分解=上位5%牽引か中勝ちか/B資金管理hold-K感度/C状態帯近傍安定=一点針排除)で接続可否を確定。3軸そろって[LOT-H1]を閉じる。中勝ち否は作業仮説、検証後に裁定
+cfs226_other_axes_curve [結論/OK 06-19] | cfs226[LOT-I1]: price+gap以外の状態軸(vola/mom中庸・高低帯、複合)を同じcfs77 simで資金曲線に横並び。全軸mult≈1ならprice+gapと同じ壁=状態探索OSは日足の限界。mult>1.1の突出軸あれば次の探索対象。実測で判定
+cfs227_mom_stability [結論/OK 06-19] | cfs227[LOT-I1 B1-枝1]: price+mom[70-90]突出の近傍安定性。隣接帯と帯幅で資金曲線、連続してmult>1.1なら丘(本物、次枝へ)、mom[70-90]だけ突出し隣接崩壊なら針(一点過適合)。LOT-H1の一点轍を先回りで潰す
+cfs228_mom_identity [結論/OK 06-19] | cfs228[LOT-I1 B1-枝2]: price×momentum丘の身分監査。A price帯10-30% B mom窓10/20/40 C 前後半 D 利益分布。price軸/窓/期間で残れば本物の丘(B1-枝3資金管理へ)、崩れれば条件点(針)。資金管理前に身分を殺す(P1の轍回避)
+cfs229_mom_capital [結論/OK 06-19] | cfs229[LOT-I1 B1-枝3]: price×momentum丘の時期分解と資金管理。(1)年別で利益が特定時期依存か各年安定か(GPT必須条件、全期間1.4xと各期間1.07の乖離)(2)hold×Kで平均rが10x方向に伸びるか。各年安定+r急伸=採用候補、時期依存orr頭打ち=10x非接続
