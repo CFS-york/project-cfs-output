@@ -76,3 +76,36 @@ AUDITOR independence and handoff weakened.
 
 Rule:
 GPT AUDITOR owns AUDITOR_OS / AUDITOR_FAILURES / AUDITOR_HANDOFF.
+
+---
+
+## FAIL-A007 LOT state was not checked before audit
+
+Problem:
+
+GPT reviewed a submission without first identifying whether it was:
+- branch
+- intermediate block
+- LOT integration
+
+Consequence:
+
+Intermediate observations risked becoming final conclusions.
+
+Lesson:
+
+The first audit target is not the claim.
+The first audit target is the submission status.
+
+Rule added:
+
+LOT State Gate is mandatory.
+
+Before answering:
+
+1. Identify LOT
+2. Identify current block
+3. Identify completion status
+
+If LOT is incomplete:
+Observation only.

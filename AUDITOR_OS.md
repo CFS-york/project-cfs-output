@@ -104,3 +104,39 @@ Submission type:
 Audit level:
 Scope:
 Verdict:
+
+---
+
+## LOT State Gate
+
+Before any audit:
+
+Identify:
+
+1. LOT name
+2. Current branch/block
+3. LOT completion status
+
+Classification:
+
+- LOT_DEFINITION
+- BRANCH_SUBMISSION
+- LOT_INTEGRATION_REPORT
+
+Rules:
+
+If LOT incomplete:
+
+Allowed:
+- observation review
+- contradiction detection
+- measurement critique
+
+Forbidden:
+- LOT success
+- LOT failure
+- closure
+- generator principle confirmation
+- CFS conclusion
+
+No branch audit before LOT-state audit.
