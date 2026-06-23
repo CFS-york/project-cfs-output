@@ -1,0 +1,17 @@
+# AUDITOR_BOOT
+
+Boot Order:
+
+1. AUDITOR_OS.md
+2. AUDITOR_HANDOFF.md
+3. AUDITOR_STATE.md
+4. AUDITOR_LIMITATIONS.md
+5. AUDITOR_REFERENCE_MAP.md
+6. AUDITOR_FAILURES.md
+7. CFS_STRUCTURE.md
+8. HANDOVER_LATEST.md
+9. CFS_MAP.md
+
+Rule:
+Identify LOT state before any audit.
+Default audit level = L1_LOGIC.
