@@ -282,6 +282,12 @@ ml_output + ファイル2 を public mirror へ同期。
 ★ v2.4: HANDOVER_FULL.md を同期対象に追加 (2 ファイル分離の全履歴版)
 ★ v3 (2026-06-11): token mask 化 (run() で push_url の token を `<TOKEN_MASKED>` に置換、 流出防止)
 
+★★ 同期の仕組み (2026-06-19 現物確認、後任ARK必読): mirror同期は **SYNC_FILES という明示リスト**(+ SYNC_DIRS)で制御される。watcher が ファイル2\ を監視するが、push_to_mirror.py が **SYNC_FILES に列挙された名前だけ** を mirror へコピー&push する。
+- **既存ファイル(SYNC_FILES内)の更新は確実に同期される**(HANDOVER/CFS_MAP/CFS_MANUAL/FAILURE_LOG 等)。
+- **新規ファイルは ファイル2\ に置いても同期されない**(SYNC_FILESに無いため)。2026-06-19 にAUDITOR_GOVERNANCE_FINAL.mdを新規作成し404を踏んだ実例あり。
+- **新規ファイルを同期したい時**: push_to_mirror.py の SYNC_FILES に `(FILES_DIR / "新名.md", "新名.md")` の1行を追加する(v2.3でcron_status.json、v3.2でarchive/、v3.3でlots/ を追加した実績と同じ要領)。この編集はscript操作=ヨーク作業。ARKは追加すべき名前を明示して依頼する。
+- **AUDITOR系(GPT管理領域)はSYNC_FILESに入れない**: AUDITOR_OS/FAILURES/HANDOFF/STATE は GPT が mirror リポジトリに直接コミットして管理(第1条=GPT管理領域)。ARKがSYNC_FILESに登録するのは責務境界侵食。SYNC_FILESはARK側CFS正史の新規追加に使う。
+
 ### ark_guard.py (★ v3、 2026-06-12 = ARK_LOOP M2)
 
 run.py が script 実行前に check_script(path) を呼ぶ。 v2 WARN 裁定 (ヨーク 「cmd 1 個」 設計) は維持しつつ、 **mode 非依存の STOP 2 種** を新設:
