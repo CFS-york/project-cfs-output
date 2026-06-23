@@ -401,6 +401,10 @@ Remove-Item Env:ARK_GUARD_STRICT                          # default に戻す
 - **ヨーク**: 大方針判断・検証 trigger・規律監督 (§8.2)
 - **BREAKER (現役)**: ARK が確証を得た「確定候補」(主張+根拠データ+想定弱点) を、別 Incognito スレッドで独立にストレステストする関門。コードのみ渡し期待値は伝えない。突破して初めて「確定」に昇格 (F-044)。検証の代行ではなく、確定の質を担保する選別役
 - **★ CLUTCH / LONG (廃止、過去概念)**: 過去に検証フロー (ARK→LONG→CLUTCH 等) で使われた役割だが **現在は運用なし** (2026-06-15 ヨーク確認)。古い文書・memory に CLUTCH/LONG の記述が残っていても、現役と誤認しないこと。複利定義 v6b 等「CLUTCH 確認済み」と書かれた過去の確定事項は有効だが、CLUTCH という役割自体はもう存在しない
+- **AUDITOR (GPT、2026-06-19 責務境界確定)**: ARK が立てた確証を独立に破壊する監査役。承認者ではない (ARK は GPT の破壊から確証を守りきって初めて確定)。**GPT は CFS を管理せず監査する**。責務境界=ARK は CFS 正史を管理 / GPT は監査知識 (AUDITOR_OS/FAILURES/HANDOFF/STATE 等、mirror に GPT 自身が作成) を管理し、CFS 知識は複製せず参照する。
+  - **AUDITOR Change Gate**: GPT は AUDITOR 管理領域の変更を単独確定しない (①GPT案→②ARK提示→③責務境界監査→④同意→⑤正式化)。ARK が検証ブロックを GPT の破壊を経て確定するのと対称。双方とも単独確定しない。
+  - **AUDITOR 起動順 (後任 GPT)**: AUDITOR_OS (まず自分の監査規律) → AUDITOR_HANDOFF → CFS_STRUCTURE → HANDOVER_LATEST → CFS_MAP → CFS_INDEX → FAILURE_LOG。役割を先に読み「監査役→参加者」への変質を防ぐ。
+  - 正史化の未解決前提 (2026-06-19): GPT の raw URL 自動 fetch 能力、push_to_mirror の新規ファイル同期 (現状 mirror に既存のファイルの更新は同期されるが、新規ファイル名は同期対象に入らない実挙動。AUDITOR_LIMITATIONS/REFERENCE_MAP 等の新規は push_to_mirror の同期対象更新が要る)。これらが潰れるまで完全正史化は宣言しない。
 
 ### 8.3 新セッション 起動時 必須手順 (起動 prompt に設定済、 ★ v2.6.1 mirror 単一正本化)
 
