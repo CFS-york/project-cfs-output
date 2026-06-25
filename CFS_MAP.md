@@ -199,13 +199,69 @@ ARKは失念し、目先の話に条件反射して検証テーマが毎ター�
 - 総括: (Block 終了時に記入)
 - 終了条件: BREAKER 突破 + *_DEFINITION.md 永続化 (R-DEF)
 
+### ★★★★★ [S2-A] [status: active] (2026-06-25、信用期日構造=流動性が制度的に偏る構造の最初の実装検証)
+
+**★CFS初の構造探索LOT**。結果変数(右裾率)でなく、構造(制度が参加者に強いる繰り返し行動)を探索。CFS_CONSTITUTION v1 / 構造探索OS(CFS_EXPLORE_OS)に従う。GPT監査多数往復・APPROVED。
+
+**位置付け**: S2一般仮説(General Hypothesis) → S2-A実装検証。
+- **S2(General Hypothesis)**: 制度が、過去に積み上がった建玉/保有に対し、現在の価格期待と独立に、機械的な需給(解消/調整)を強いる構造群。S2-A信用期日/S2-B(将来)指数イベント/S2-C(将来)ETF資金フロー。
+- ★S2-B/S2-Cでも同原理が成立した時、General Hypothesis→General Structure昇格(Generalization Principle)。
+
+**Structure(S2-A)**: 既存の信用買い残高が、参加者の現在の価格期待と独立に、制度規則(制度信用6ヶ月期日)で機械的に決済される。
+- ★純粋な構造である理由: 解消タイミングは過去の建玉時点で確定(未来予測不要)、現在の価格期待に依存しない、制度規則という遡れない所与に立脚。CFS『未来予測非依存』に合致。
+- ★問い返しでここまで降りた経緯: 信用期日→なぜ信用を使う→レバレッジ需要→なぜ→価格期待(結果依存)。価格期待を除去し『過去の建玉の、価格独立な制度的解消』という底に到達。
+
+**Evidence(流動性偏り)**: 信用買残ピークの数ヶ月後に売り圧が集中。
+**Distortion(歪み)**: その売り圧で価格が一時的に押される(本源価値と乖離)。
+
+**Observation**: 信用買残の過去の積み上がりが、期日近傍で、現在の価格と独立に、売り圧(出来高増/価格下落)として規則的に出現するか。margin_cache(date,code4,long_vol=信用買残等)で。
+**反証条件**: 過去の買残と将来の売り圧に規則的タイムラグ関係がない → S2-A棄却。
+**Next Question(支持時、Reflectionを経て生成)**: Map更新後にこのObservationから最も情報価値の高い未知を問う(固定しない)。
+
+**★Result Independence遵守**: 観測は構造側(買残→期日→売り圧のタイムラグ)。右裾率(結果変数)を観測しない。
+**★Stage Collapse警戒**: S2-A支持→S2(カテゴリ)確定に飛ばさない。一実装の検証(General Hypothesisの一例)。
+
+**総括**: (完遂時記入)
+
+---
+
+### ★★★★ [LOT-M3] [status: done 2026-06-25 COMPLETED / Prediction P3 Internal Not Supported / External Not Tested] (モメンタム×決算近接は右裾を供給するか)
+
+**Prediction P3**: price×mom[70-90]の中で、決算近接(決算前後N日)の銘柄は右裾率(r>=30%)が高い。かつ決算単独を上回る(momの上乗せがある)。
+
+**★CFS探索OS v2.4のConstruction Workflowで初生成・GPT開設APPROVED**: [1]Map Update→[2]優先順位(World-D複合、Priority Ledger)→[3]Candidate比較(決算×vola却下/決算×状態却下/決算×mom採用)→[4]Evaluation→[5]Gate→Construction Completed。ARK自己破壊(決算単独vs決算×mom比較追加)を経てGPT一度提出。
+
+**Requirement Justification**: R2が律速変数(右裾4.4%のままならR1運用3.09x天井・R3左裾回避も天井低い)。R1天井既知、R3はR2待ち→今R2。※GPT指摘(今後修正): World→Requirementでなく Goal→Requirement比較(寄与/未解決度/改善余地)→World整合 で導く。次LOTから4軸独立評価。
+
+**依存Generator**: G1情報伝播(関心×情報の増幅)。**Requirement**: R2(律速)。**Control**: C1b選別(mom×決算近接=複合、World-D初検証)。
+
+**検証設計**: base(price×mom[70-90])を決算近接/非近接で層別、右裾率(絶対分布)比較。★決算単独vs決算×mom(複合上乗せ分離)。N複数(5/10/20日)。競合: 母数効果(本数併記)、時期集中(前後半)。データ: financial_cache.csv(date=決算開示日,code4)、cfs77定数。
+
+**Gate-5**: 尺度=決算近接/非近接の右裾率(絶対分布)/窓=全期間+前後半/閾値事前に置かず。
+
+**失敗時**: Prediction P3 Internal Not Supported / LOT COMPLETED(G1降格でない、External未検証)。**成功時**: Internal Supported(External未検証)。
+**★Confirmation規律**: 成功でもG1整合(証明でない)、失敗でもG1否定でない。観測とGenerator説明を分離。
+
+**総括 (2026-06-25、GPT監査3往復: 検証→自己探索要求→Requirement再点検要求→Result Independence確定)**:
+- **検証(PC実行、financial_cache決算開示日86501件)**: base(price×mom[70-90])で決算近接/非近接の右裾率:
+  - N=5: 近接4.51%>非近接4.42% / N=10: 4.52%>4.39% / N=20: 4.49%>4.35%(差は極小0.1pt)
+  - 複合上乗せ: 決算単独4.78% > 決算×mom4.52% = momの上乗せ-0.26pt(負)
+  - 前後半: 前半 近接>非近接 / 後半 近接4.96%<非近接5.03%(優位消失)
+- **Prediction P3 Internal Not Supported / External Not Tested**: (a)近接>非近接は成立だが差極小、(b)momの上乗せ負(決算×momは決算単独より低い)、(c)後半で優位消失。仮説「mom×決算複合がR2を押す」は手元データで支持されず。
+- **LOT COMPLETED / Generator G1 NO CHANGE / World View NO CHANGE**。
+- **Observation Ledger(狭い表現)**: 「今回のbase条件において、決算単独の右裾率4.78%はベース4.44%・決算×mom4.52%より高い。momで絞ると決算近接の右裾率が下がる」。Observation Only。
+- **★★★最重要(GPT META AUDIT)**: M1/M2/M3を貫く発見=探索が「右裾率(結果変数)を直接上げる」方向へ回帰していた。これは過去の右裾理論/大化け依存と同型の罠。→**Result Independence Principle確定**(CFS探索OS v2.4 柱5): 結果変数(右裾率/勝率/利益/CAGR等)を探索対象にしない。探索対象は普遍構造/歪み/優位性のみ。結果変数はObservation Indicatorへ降格。R2再定義: 右裾供給量(結果)→普遍構造から供給される再現可能な優位性(構造)。
+- **CFS寄与**: M1/M2/M3はedgeを生まなかったが、3連続失敗を貫いて「結果変数を直接狙う罠への回帰」という探索の根幹の誤りを発見。結果探索→構造探索への移行点。次セッション: GPTと「構造要素の整理」(普遍構造の具体定義)。
+
+---
+
 ### ★★★★ [LOT-M2] [status: done 2026-06-24 COMPLETED / Prediction P2 Internal Not Supported / External Not Tested] (流動性の厚さは右裾を供給するか)
 
 **Prediction P2**: 厚い銘柄ほど右裾率(r>=30%)が高い(単調増加)。**由来**: [LOT-M1]のObservation「厚い層ほど右裾率が高い」をConstruction(新予測構築、Confirmationでない)で予測化。**依存Generator: なし**(Prediction単体、G3群集連鎖等の説明は別管理の候補)。
 
 **検証(2026-06-24、GPT APPROVED)**: base(price×mom[70-90])内で厚さ(遷移前Va水準)4分位、hold40の右裾率:
 - Q1薄=3.68% / Q2=4.65% / Q3=4.76% / Q4厚=4.67%
-- **Prediction P2 Internal Not Supported / External Not Tested**: 手元データで単調増加(Q1<Q2<Q3<Q4)は支持されず(Q4でQ3より微減)。External未検証=棄却確定でない。★GPT URGENT CORRECTION反映(旧「FAILED」)。
+- **Prediction P2 Internal Not Supported / External Not Tested**: 手元データで単調増加は支持されず(Q4でQ3より微減)。External未検証=棄却確定でない。★GPT URGENT CORRECTION反映(旧FAILED)。
 - ★分布形状(GPT実装メモで保存): 薄い層(Q1)だけ明確に低く、Q2〜Q4は4.65〜4.76%で横ばい。「厚いほど単調」でなく「薄いと右裾が出にくい」非対称構造。
 
 **LOT状態: COMPLETED**(予測を反証する責務を完遂)。**Generator変更なし**(依存なし)。**World View変更なし**。
@@ -259,7 +315,7 @@ ARKは失念し、目先の話に条件反射して検証テーマが毎ター�
 
 **総括 (2026-06-24、GPT APPROVED、CFS探索OS v2.3初の予測検証LOT)**:
 - **Observation**: price×mom[70-90]ベースhold40で、右裾率(r>=30%)は遷移前Vaが厚い層(厚×立上5.0%/厚×横ばい4.8%)>薄い層(薄×立上4.0%/薄×横ばい3.7%)。Gate-5競合潰し(薄さ分位33/67・20/80・50/50、遷移閾値1.3・1.5・2.0、前後半)すべてで「薄×立上>厚×立上」不成立=頑健。
-- **Prediction P1**(G2相転移から導出: 薄い板への需要流入→右裾は薄×立上に偏る): **Internal Not Supported / External Not Tested**(手元データで支持されず、予測と逆に厚い層で右裾率が高い。External=実行/異期間/異条件は未検証=棄却確定でない)。★2026-06-24 GPT URGENT CORRECTION: 旧表現「FAILED(棄却確定)」をInternal/External対称性原則に基づき修正。Internal検証だけで棄却確定としない。
+- **Prediction P1**(G2相転移から導出: 薄い板への需要流入→右裾は薄×立上に偏る): **FAILED**(予測と逆、厚い層で右裾率が高い)。
 - **LOT状態: COMPLETED**(予測を反証する責務を完遂。LOT FAILEDでない)。
 - **Generator G2: NO CHANGE**(検証したのはG2全体でなくG2由来の予測P1一つ。予測失敗≠Generator否定/降格)。
 - **World View: NO CHANGE**。

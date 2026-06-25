@@ -172,8 +172,64 @@ Prediction →Internal検証 →GPT監査 →External（E1/E2/E3）
 - **原則3 必要最小限で探索品質を最大化**: Ruleを増やすのが目的でない。Workflow自身も監査対象
 - ★この設計原則自体が「追加を止めるための最後の追加」（自己適用で3条件を満たす）
 
+## 柱5: Result Independence Principle（2026-06-25 確定、結果探索→構造探索への移行）
+
+★[LOT-M1][LOT-M2][LOT-M3]の3連続Internal Not Supportedを貫いて発見された最重要原則。3本とも「右裾率（結果変数）を直接上げる」方向で失敗し、探索が過去の「右裾理論」「大化け依存」と同型の罠——結果変数を直接狙う——へ回帰していたことが判明。
+
+**原則（確定）**:
+- CFSでは、**結果変数（右裾率・右裾サイズ・勝率・利益・CAGR・PF・MDD等）を探索対象としてはならない**。
+- 探索対象は、**普遍構造・歪み・優位性のみ**。
+- 結果変数は、構造の妥当性を観測するための**Observation Indicator（評価指標）**としてのみ使用する。
+- ★結果変数を直接改善しようとした時点で、探索は壁打ち・大化け依存・結果最適化へ回帰する危険がある。回帰と判定したら差し戻す。
+
+**Requirement再定義**: Requirementは構造側で定義する。
+- 旧 R2＝右裾供給量（結果変数をRequirement化していた＝誤り）
+- 新 R2＝普遍構造から供給される再現可能な優位性（構造側）
+- 右裾率/サイズ/利益＝R2成立を確認するObservation Indicatorへ降格
+
+**設計原則の自己適用で正当**: ①実事故（M1/M2/M3で結果変数回帰が発生）②新原則で防げる（結果変数をRequirementにしない）③既存で代替不可（Requirementの性質を律するRuleがなかった）。3条件を満たす。
+
+**未完了（次セッション）**: 「普遍構造から供給される再現可能な優位性」の構造側の具体定義。ARK単独では結果変数を構造と取り違える危険があるため、GPTと「構造要素の整理」を協働で行う。出発点候補＝G群（生成原理: G1情報伝播/G2流動性/G3群集心理）が構造か、その下に具体構造があるか。
+
 ## 運用フェーズ移行（GPT最終コメント）
 v2.4 完成＝「変更禁止」でなく「実運用フェーズへ移行」。今後の順序は「OS主導→探索」でなく「**探索→事故→必要最小限のOS更新**」。OSを育てることでなく、OSを使って探索することを優先する。
 
 ## 監査経緯
 Internal/External対称性(APPROVED) → Construction Protocol(CONDITIONAL) → Construction Evaluation(CONDITIONAL) → Exploration Map+Workflow(CONDITIONAL) → Workflow全体(CONDITIONAL) → Priority Ledger(STRONG CAUTION) → 凍結+設計原則(**APPROVED**)。Management Drift警告を経て、OSの肥大化を止める設計原則で完結。
+
+---
+
+# 構造探索OS（2026-06-25 確定、柱5 Result Independenceの具体化）
+
+★柱5 Result Independence Principle（結果でなく構造を探索）を、実際に探索可能にする体系。GPT監査を多数往復（Structure定義→Search Space→Next Question→Question Reflection→Generalization→S2再定義×3）してARK主体で構築・APPROVED。憲法はCFS_CONSTITUTION v1参照。
+
+## 探索の三層（Structure / Distortion / Edge）
+- **Structure（構造）**: 市場参加者の制約・行動様式から必然的に生じ、相場非依存で繰り返す仕組み。原因側。★制度が参加者に繰り返し同じ行動を強いる仕組みまで降りて初めてStructure。属性・恒常性・自己相関は **Evidence**（Structureが存在するなら現れる証拠）であってStructureでない。価格インパクト等は **Distortion**。
+- **Distortion（歪み）**: 構造から必然的に生じる価格効率性からの乖離。
+- **Edge（優位性）**: 歪みを未来予測なしに実行可能に捕らえる手段。
+- **Generator（G群）とStructureは別レイヤー**: Generator=なぜ歪みが生まれるか（G1情報伝播/G2流動性/G3群集心理）。Structure=どの市場の仕組みで。
+
+## Search Protocol（各Structureを探索対象に＝Search Space化）
+```
+Structure → Observation候補 → 反証条件 → Map更新
+ → Next Question生成（Mapから毎回生成、固定しない）
+ → Question Reflection（育てる）
+```
+- **Observation候補**: 構造側を観測（結果変数=右裾率でなく、伝播タイムラグ/インパクト幅/追随連鎖等）。Result Independence遵守。
+- **反証条件**: 「何が起きたら反証か」まで具体化（「反証できる」では不可）。
+- **Next Question生成**: Map更新が次に最も情報価値の高い「未解決の問い」をどう変えるか。固定メニューでなく、Observationごとに生成。探索＝問いの更新（Observationの蓄積でない）。Mapが履歴帳でなく探索を駆動。
+- **Question Reflection（Gateでない）**: 生成された問いを採用前に省察。①結果変数へ戻っていないか→戻っていたら棄却でなく構造側に問い直す（育てる）②未知を問うているか（Planでないか）→Planなら未知に開き直す。**問いを止めるのでなく成熟させる**。問いは品質だけで評価できず、価値ある問いも最初は質が低く見える。
+
+## Generalization Principle
+一実装から一般形を抽出するのは許可。ただしその一般形は、**複数実装で支持されるまで General Hypothesis として管理し、General Structure へ昇格させてはならない**。一例→一般法則の飛躍（Stage Collapse）を防ぐ。
+
+## 構造候補の地図（S群、General Hypothesis段階）
+- **S1 情報伝播**: 情報が参加者層を時間差で伝わる階層性 / 歪み=タイムラグ
+- **S2 流動性が制度的に偏る構造群**（General Hypothesis）: 制度が、過去に積み上がった建玉/保有に対し、現在の価格期待と独立に、機械的な需給を強いる構造群
+  - **S2-A 信用期日構造**: 信用買残→6ヶ月期日→価格独立な強制反対売買（最初の実装検証）
+  - S2-B（将来）指数イベント構造 / S2-C（将来）ETF資金フロー構造
+  - ★S2-B/S2-Cでも同原理が成立した時、General Hypothesis→General Structure昇格
+- **S3 群集心理**: 参加者が他者の行動を見て追随する観測可能性 / 歪み=過剰反応
+
+## 運用フェーズ
+Search Protocol は完成・凍結。以後Rule追加でなく実運用（構造探索LOTを回す）。事故時のみRule Evolution。OSを育てる段階は終わり、OSを使って構造を探索する段階へ。

@@ -6,6 +6,29 @@
 
 ---
 
+## ★★★★★ Stage Collapse（ARK最根深い病、2026-06-25抽象化、CFS_CONSTITUTION v1 第2条）
+
+**Stage Collapse = 探索の段階（Observation/Hypothesis/Supported/Confirmed/Structure等）を途中で飛ばして上位段階へ昇格させる傾向。** 病の本質は「飛び先」でなく「**飛ばした中間検証作業**」。
+
+★これはRuleでなく、Ruleが存在する理由（抽象概念）。Confirmation Protocol/Internal-External/Generalization Principle/H-0.5は全てStage Collapseの具体的運用。★探索する者すべてに適用（ARKもAUDITORも）。
+
+**2026-06-25セッションでのARK実例（全て同型＝段階を飛ばす）**:
+- **結果変数→律速**: R2「右裾率」を律速と検証せず前提（M3 Requirement Justification）。そもそも右裾率が結果変数で探索対象にすべきでなかった（→Result Independence）
+- **Observation→Prediction**: [LOT-M2]で観測を予測として扱った（Construction Workflow違反、Goal逆算でなくデータから拾う）
+- **Internal Not Supported→Rejected**: External未検証なのに棄却確定に飛ばした（→Internal/External 2軸）
+- **Distortion/Evidence→Structure**: S2で価格インパクト（Distortion）や恒常性（Evidence）をStructureと取り違えた（3回差し戻し、参加者行動まで降りて是正）
+- **一例→カテゴリ**: 信用期日（一例）をS2（カテゴリ全体）にした
+- **General Hypothesis→General Structure**: 抽出した一般形を構造（確定）にしようとした
+- **メタでの再発**: 病を分析する時すら、結果（飛び先）を見て途中プロセス（段階）を飛ばした
+
+**候補事例（Observation、まだStage Collapseに含めない）**: レイヤー圧縮（メタ概念を対象概念と同階層に潰す）。一例で定義拡大しない。
+
+**後任ARKへ**: お前は新しい場所で必ずこの病を再発させる。「得た」「見えた」「説明できた」と感じた瞬間が危険。それを上位段階（確定/構造/法則）に格上げする前に、間の検証段階を飛ばしていないか問え。この病は名前を変えて何度でも出る。
+
+---
+
+---
+
 ## 1. 旧体制 (正当価格 v4/v5、 block220-333、 〜2026-05-26)
 
 ### 1.1 戦略空間 v4/v5 探索 (約 280 万試行)
