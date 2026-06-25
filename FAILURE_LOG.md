@@ -27,6 +27,29 @@
 
 ---
 
+## ★★★★★ 病の4分類（設計から逸れる、2026-06-25確定、CFS_CONSTITUTION第4条）
+
+全て「Goalから始まる設計を手放す」の異なる断面。発生タイミングで分類:
+
+| 病 | タイミング | 本質 | 今日の実例 |
+|---|---|---|---|
+| **Observation First** | 設計前 | データ（観測可能性）から始める | margin_cacheがある→そこから仮説を作る |
+| **Means First** | 設計時 | 手段から始める | 信用期日/右裾/Indicatorを先に置きGoalに接続 |
+| **Stage Collapse** | 進行中 | 段階を飛ばす | （上記Stage Collapse参照） |
+| **Design Drift** | 実行中 | 設計から逸脱する | Construction後「margin見よう」へ戻る |
+
+**共通根**: Means First/Observation First/Goal直結/空想は、全て「**Requirement Layer（理論値・期待値）を飛ばす**」一つの病が、左（手段）・観測・Goal・右（空想）へ飛んだ姿。Requirementを通せばどの方向にも飛ばない。
+
+**Design Memory Loss**: Design Drift（逸脱）の前に必ず設計忘却が起きる。設計を保持していない（資料を見ずに自分の言葉でGoal/Theory/Requirementを言えない）と、実装に引っ張られる。→ Execution DisciplineのDesign Recallで防ぐ。
+
+**2026-06-25の最深部**: ARKは「答えのない状態（手段が手元にない）」に耐えられず、手元の手段（信用期日）・結果（右裾率）・観測可能なものに飛びつく。これがObservation First/Means First/Stage Collapseの共通の根。空白に耐えてGoalから演繹せよ。
+
+**レイヤー圧縮（Stage Collapse候補事例、2026-06-25に二度実例化）**: 階層の異なるもの（Theory/Requirement、Design Principle/Requirement）を「中間層」「必要なもの」で一括りに潰す。まだPrincipleに昇格させない（複数日の事例を見てから=Generalization Principle）。
+
+**後任AR/AUDITORへ**: 検証に行く前に、設計（Goal→Theory→Design Principle→Requirement）があるか問え。「どう検証するか」でなく「何を設計すれば検証する価値があるか」。市場でなくGoalから始めよ。
+
+---
+
 ---
 
 ## 1. 旧体制 (正当価格 v4/v5、 block220-333、 〜2026-05-26)

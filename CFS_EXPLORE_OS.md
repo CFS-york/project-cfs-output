@@ -233,3 +233,43 @@ Structure → Observation候補 → 反証条件 → Map更新
 
 ## 運用フェーズ
 Search Protocol は完成・凍結。以後Rule追加でなく実運用（構造探索LOTを回す）。事故時のみRule Evolution。OSを育てる段階は終わり、OSを使って構造を探索する段階へ。
+
+---
+
+# Construction運用手順 + Execution Discipline（2026-06-25確定・GPT承認・凍結）
+
+★思想はCFS_CONSTITUTION第3-5条。ここは運用手順。
+
+## Construction手順（Goalから始める。市場から始めない）
+```
+① Goal確認（16ヶ月10x、レバなし複利、現実実装可能）
+② Theory構築（なぜGoalが成立し得るか、反証可能な世界の主張）
+③ Design Principle確認（未来予測不要/異常相場非依存/実装可能=CFS不変）
+④ Requirement導出（このGoalを満たす定量条件: 平均RR/必要Trade数/頻度/保有期間）
+⑤ Optimization（Requirement制約下で、実データ上にGoal達成の最適トレード構成）
+⑥ Requirement Refinement ⇄ Theory Refinement（双方向閉ループで磨く）
+⑦ Structure Extraction（成功シミュレーションから未来情報を除き構造抽出）
+⑧ Logic Construction
+⑨ Internal（実データ自壊）→ ⑩ External（別期間/実装/再現で立証）
+```
+- Goalを抽出条件にしない（設計目標に留める）。抽出条件はRequirement（理論値・期待値）。
+- Search Protocol（上述の構造探索OS）は④Internalの中の「LOT実行部分」。Construction全体でない。
+- GPT監査は⑨Internal終了→ARK自己判定→⑥GPT監査→⑦External（途中でハンドルを握らせない）。
+
+## Execution Discipline（毎LOT必須。設計を保持し、逸脱を防ぐ）
+```
+Construction →
+ ① Design Recall（設計を保持しているか）
+    = 資料を見ずに、自分の言葉で再構成できるか:
+      Goalは何か / Theoryは何か / Design Principleは何か /
+      Requirementは何か / 今回何を反証しようとしているか
+    説明できないなら、まだ設計を保持していない（実装に引っ張られる）
+ ② Design Check（設計を書き出す: Theory/Requirement/Optimization目的/反証条件）
+ ③ Drift Check（途中で逸脱してないか/別テーマに逸れてないか/
+    手元データで意思決定してないか）
+ → Internal → External
+```
+4監査項目: ①Design Alignment（Goal/Theory/Requirementと一致か）②Drift Detection（データ/思いつきに引っ張られてないか）③Scope Integrity（検証対象が入れ替わってないか）④Feedback Integrity（結果をTheory/Requirementへ正しく戻したか）。
+
+## 凍結（Freeze Principle、CFS_CONSTITUTION第5条）
+Construction系OS（Construction Philosophy / Execution Discipline / Theory Construction）は凍結。議論で改訂せず、運用証拠でのみ改訂。次はこのOSを使ってTheory Construction（別LOT）を回す。
