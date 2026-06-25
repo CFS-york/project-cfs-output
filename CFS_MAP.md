@@ -199,7 +199,28 @@ ARKは失念し、目先の話に条件反射して検証テーマが毎ター�
 - 総括: (Block 終了時に記入)
 - 終了条件: BREAKER 突破 + *_DEFINITION.md 永続化 (R-DEF)
 
-### ★★★★ [LOT-M1] [status: done 2026-06-24 COMPLETED / Prediction P1 FAILED] (流動性遷移は右裾を供給するか)
+### ★★★★ [LOT-M2] [status: done 2026-06-24 COMPLETED / Prediction P2 Internal Not Supported / External Not Tested] (流動性の厚さは右裾を供給するか)
+
+**Prediction P2**: 厚い銘柄ほど右裾率(r>=30%)が高い(単調増加)。**由来**: [LOT-M1]のObservation「厚い層ほど右裾率が高い」をConstruction(新予測構築、Confirmationでない)で予測化。**依存Generator: なし**(Prediction単体、G3群集連鎖等の説明は別管理の候補)。
+
+**検証(2026-06-24、GPT APPROVED)**: base(price×mom[70-90])内で厚さ(遷移前Va水準)4分位、hold40の右裾率:
+- Q1薄=3.68% / Q2=4.65% / Q3=4.76% / Q4厚=4.67%
+- **Prediction P2 Internal Not Supported / External Not Tested**: 手元データで単調増加(Q1<Q2<Q3<Q4)は支持されず(Q4でQ3より微減)。External未検証=棄却確定でない。★GPT URGENT CORRECTION反映(旧「FAILED」)。
+- ★分布形状(GPT実装メモで保存): 薄い層(Q1)だけ明確に低く、Q2〜Q4は4.65〜4.76%で横ばい。「厚いほど単調」でなく「薄いと右裾が出にくい」非対称構造。
+
+**LOT状態: COMPLETED**(予測を反証する責務を完遂)。**Generator変更なし**(依存なし)。**World View変更なし**。
+
+**競合検討**: モメンタム交絡corr=0.128(弱・ほぼ独立)、サイズ(価格)corr=0.015、時期(前後半とも厚>薄成立)。★「競合排除済み」とは言わない(GPT監査)。言えるのは「検討した主要競合3種=サイズ/モメンタム/時期では説明できなかった」まで。業種/市場区分/指数構成/流動性制度/イベント等は未検討。
+
+**★Observation Ledger登録(GPT推奨の狭い表現)**: 「今回のbase条件において、Q1薄層は右裾率3.68%、Q2〜Q4は4.65〜4.76%。薄層のみ右裾率低下を観測。」Observation Onlyとし、Generator候補にもWorld候補にも昇格させない(Confirmation禁止)。
+
+**CFS寄与**: 「厚いほど右裾」という綺麗な仮説をちゃんと壊し、壊した結果「薄層のみ弱い」という予想外の観測が残った。CFS探索OS v2.3以降で初めてObservation→Constructionの流れが機能した事例。Prediction FAILED≠LOT FAILEDを2例目として確立。
+
+**物理定数**: cfs77完全流用(HOLD=40, K=20, COST=0.005, TAX=0.20315)。
+
+---
+
+### ★★★★ [LOT-M1] [status: done 2026-06-24 COMPLETED / Prediction P1 Internal Not Supported / External Not Tested] (流動性遷移は右裾を供給するか)
 
 **仮説文(Generator駆動)**: G2流動性相転移——右裾は、流動性が薄い局面に需要が入った時に生まれる。予測: 右裾は「遷移前に流動性が薄かった」銘柄に偏る。
 
@@ -238,7 +259,7 @@ ARKは失念し、目先の話に条件反射して検証テーマが毎ター�
 
 **総括 (2026-06-24、GPT APPROVED、CFS探索OS v2.3初の予測検証LOT)**:
 - **Observation**: price×mom[70-90]ベースhold40で、右裾率(r>=30%)は遷移前Vaが厚い層(厚×立上5.0%/厚×横ばい4.8%)>薄い層(薄×立上4.0%/薄×横ばい3.7%)。Gate-5競合潰し(薄さ分位33/67・20/80・50/50、遷移閾値1.3・1.5・2.0、前後半)すべてで「薄×立上>厚×立上」不成立=頑健。
-- **Prediction P1**(G2相転移から導出: 薄い板への需要流入→右裾は薄×立上に偏る): **FAILED**(予測と逆、厚い層で右裾率が高い)。
+- **Prediction P1**(G2相転移から導出: 薄い板への需要流入→右裾は薄×立上に偏る): **Internal Not Supported / External Not Tested**(手元データで支持されず、予測と逆に厚い層で右裾率が高い。External=実行/異期間/異条件は未検証=棄却確定でない)。★2026-06-24 GPT URGENT CORRECTION: 旧表現「FAILED(棄却確定)」をInternal/External対称性原則に基づき修正。Internal検証だけで棄却確定としない。
 - **LOT状態: COMPLETED**(予測を反証する責務を完遂。LOT FAILEDでない)。
 - **Generator G2: NO CHANGE**(検証したのはG2全体でなくG2由来の予測P1一つ。予測失敗≠Generator否定/降格)。
 - **World View: NO CHANGE**。

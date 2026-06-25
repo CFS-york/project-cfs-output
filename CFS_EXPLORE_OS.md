@@ -108,3 +108,72 @@ CFS探索OS v2.3 が定めた「承認後の最初の作業＝運用理論値の
 **次LOTの定義**: C1a観測モデルを外部データ（IR/適時開示/板/テーマ/日中足）で拡張し、R2右裾供給量を増やせるか。★「選別の強化」でなく「観測モデルの拡張」。前提チェック＝J-Quants light planで何が取得可能か。
 
 **今後のLOT評価基準（GPT総括）**: LOTは「面白い結果が出た」でなく「R1/R2/R3 をどのControlでどれだけ前進させたか」で評価する。
+---
+
+# CFS探索OS v2.4（2026-06-24 ARK起案・GPT APPROVED・YORK承認）
+
+v2.3（壁打ち監視・運用理論値2層）に、[LOT-M1][LOT-M2]の実検証で露呈した欠落を補い、**探索全体を管理・進化させるOS**へ。4本柱で構成。GPT監査を多数往復（Internal/External対称性→Construction Protocol→Evaluation→Workflow全体→Priority Ledger→凍結）して完全合意。
+
+## 背景（v2.4が補った欠落）
+v2.3はVerification（仮説の検証規則）中心だった。[LOT-M1][LOT-M2]の実検証で判明:
+- Prediction FAILEDをLOT FAILEDに格上げする昇格事故（→Internal/External Status）
+- Internal検証だけで棄却確定する非対称（→External 3層）
+- 観測から仮説を拾う逸脱＝[LOT-M2]（→Construction Workflow）
+- 良い仮説を選ぶ基準の欠如（→Construction Evaluation）
+- 探索が閉ループでない（→Exploration Map Update）
+- 優先順位の品質が監査できない（→Priority Ledger）
+- 管理項目の無限肥大リスク（→設計原則）
+
+## 柱1: Construction Workflow（仮説をどう作るか、強制ゲート）
+```
+Observation/Goal →[1]Exploration Map Update →[2]優先順位更新（+Priority Ledger+保留プール）
+ →[3]Candidate生成 →[4]Construction Evaluation →[5]Workflow Gate →[6]LOT開設
+```
+- 各段が前段の通過を要する強制ゲート（Rule＝知識でなくWorkflow＝強制）
+- ★[2]→[3]: 優先順位を経ないとCandidate生成不可＝「面白そう→候補」を塞ぐ
+- ★Observationは単独でCandidateにできない（[1][2]を経る）＝[LOT-M2]逸脱の禁止
+- 初回（Goal起点）も[1][2]を飛ばさない
+- **Goal逆算**: Candidate生成はGoal→理論値→World→Control→Generator→Predictionの逆算（観測から拾わない）
+
+### Construction Evaluation（[4]、候補の品質評価）
+- 足切り（満たさないと開設不可）: ⑤反証価値 / ⑥差分性 ＋ LOT開設条件5項
+- 順序づけ（複数候補の優先順位、相対比較）: ①Goal寄与 / ②理論値整合 / ③期待値改善量 / ④Generator整合
+- ★採点は順序づけの道具。絶対点で機械決定しない（数字遊び防止）
+
+### Workflow Gate（[5]、LOT開設ゲート）
+G1 Goal寄与 / G2 地図更新狙い / G3 接続（理論値/期待値/World/Control/Generator）/ G4 更新予定。全説明できて開設。
+
+## 柱2: Exploration Map Update（閉ループ、LOT後に地図更新）
+- 探索地図: Goal / 成功条件 / 理論値(R1-R3) / 期待値 / World(A-D) / Control(C1a-C4) / Generator(G1-G3) / Prediction群 / LOT履歴 / Observation Ledger / 探索優先順位
+- LOT終了後、結果（Internal Status + Observation）を受けて地図のどの要素が更新されるかを処理
+- ★差分更新（変わった要素中心＋波及、全要素レビューしない）
+- 保留候補プール: 後回し候補を保持、次のMap Updateで再評価（永久に消えない）
+- ★[LOT-M1][LOT-M2]で欠けていた＝観測をLedgerに置くだけで地図に反映しなかった
+
+### Priority Ledger（[2]優先順位更新の監査記録）
+優先順位更新ごとに記録: ①変更理由 ②Goalとの接続 ③変更前との差分 ④後回しになった探索（→保留プールへ）。探索の舵を監査可能にする。
+
+## 柱3: Verification Protocol（仮説をどう検証するか）
+```
+Prediction →Internal検証 →GPT監査 →External（E1/E2/E3）
+```
+- **Internal/External 2軸Status**:
+  - Internal Status: Supported / Not Supported（手元データ）
+  - External Status: Confirmed / Rejected / Not Tested
+- **External 3層**: E1再現検証（別期間/別窓/別サンプル＝偶然排除）/ E2実装検証（スリッページ/流動性/実取引近似。CFS1/CFS2はここで死んだ）/ E3運用検証（資金配分/複利/DD＝10x接続）
+- **対称な昇格禁止**: Internal Supported→Confirmed 禁止、Internal Not Supported→Rejected 禁止（肯定・否定とも External を経て初めて確定。否定はE1で足りる/肯定はE3まで＝コストの差であって原則の非対称でない）
+- **LOT状態**: COMPLETED（検証完了）/ Internal Supported/Not Supported / External Confirmed/Rejected。旧「FAILED（棄却確定）」は廃止
+- **Confirmation/Construction分離**: Observationから予測を作る（Construction）は許可、Observationを検証済み予測として扱う（Confirmation）は禁止
+- GPT監査は Internal と External の間の監査層（旧BREAKERの役割を統合。BREAKERは現状存在しない）
+
+## 柱4: 設計原則（OS自身の進化を律する＝Management Drift防止）
+- **原則1 Rule追加停止条件**: Ruleは「問題が起きたから」でなく「既存Ruleでは防げない事故が実際に発生した」時だけ追加。監査理由必須
+- **原則2 Rule Evolution 3条件**: ①既存で防げない事故が起きた ②新Ruleで防げる ③既存で代替できない。全て満たす時だけ更新
+- **原則3 必要最小限で探索品質を最大化**: Ruleを増やすのが目的でない。Workflow自身も監査対象
+- ★この設計原則自体が「追加を止めるための最後の追加」（自己適用で3条件を満たす）
+
+## 運用フェーズ移行（GPT最終コメント）
+v2.4 完成＝「変更禁止」でなく「実運用フェーズへ移行」。今後の順序は「OS主導→探索」でなく「**探索→事故→必要最小限のOS更新**」。OSを育てることでなく、OSを使って探索することを優先する。
+
+## 監査経緯
+Internal/External対称性(APPROVED) → Construction Protocol(CONDITIONAL) → Construction Evaluation(CONDITIONAL) → Exploration Map+Workflow(CONDITIONAL) → Workflow全体(CONDITIONAL) → Priority Ledger(STRONG CAUTION) → 凍結+設計原則(**APPROVED**)。Management Drift警告を経て、OSの肥大化を止める設計原則で完結。
