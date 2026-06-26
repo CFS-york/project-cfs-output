@@ -613,3 +613,27 @@ ARKは失念し、目先の話に条件反射して検証テーマが毎ター�
 - **生死: 棄却寄りだが未確定**。(B)で非対称は弱い(大化けリフト1.66xは信用2.95xより穏やか、だが外れの損-16.9%が深い)。損切りl=−8%でlを限定した確定simが未検証。下位5%-16.9%はギャップダウンで損切り捕捉困難の公算が高く、l=−8%前提は崩れる見込み→次ARKが損切りsimで決着させる
 - **次ARKの最初の一手候補**: ①ARK-7損切りsimで決着 ②h4e/signal_all把握(未踏最有力) ③大化けと外れの分離別原理 ④ARK-3分散の素
 - **★鍵の発見**: 信用中庸は点灯でなく選択スコアとして効く(日次selに選別が宿る、cfs140整合)。P1特徴と別系統(重ねると下がる)=分散の素候補
+
+---
+
+## ★★★★ [TEACHER-SPEC] LOT 進捗更新（2026-06-26）
+
+第一LOTのTeacher Construction実装を進め、最終的に研究順序が修正された。
+
+**実装の経緯（god_eye 3版）**:
+- god_eye_min: 各時点で全銘柄の最大瞬間風速を当てる構成 → 2112倍（無意味な上限、神の目過剰）
+- god_eye_v2: Exit固定/分散K=5/MIN_VA=1億の制約追加 → 4563倍（Constraint Auditで流動性違反38%を捕捉）
+- god_eye_v3: 複利計算修正/Top10%近傍/Trade+State記録 → 数千倍（教師集合1395トレード抽出。Constraint Audit優先で出力。流動性違反21-26%）
+- 保存: god_eye_v3.py→scripts\、教師集合teacher_v3_*.csv→C:\mnt\data\teacher\。v2/min→archive。
+
+**重大な軌道修正（GPT通達 + ヨーク同意）**:
+- ★Teacher Constructionは研究目的でなく、Goal達成の**手段**だった。一日それを目的化していた。
+- ★教師を先に作ると、Goal成立条件なしに最大化し数千倍（非現実）になる。
+- ★研究順序にSTSD（Success Trade Simulation Design）を挿入: Goal→STSD→Teacher Construction→...（CFS_EXPLORE_OS参照）。
+- ★STSD概念設計（GPT承認）: Goal成立条件 = A収益∧B リスク∧C実装∧D普遍 の領域。数値は実データ検証で決める。
+
+**第一LOTの現状**: Teacher Specification（教師の定義・制約）は固まった。だが教師は、STSD（Goal成立条件領域）に基づいて**再構成される**。god_eye_v3は「STSDなしで作ると数千倍になる」を示した実験記録として保持（破棄しない）。
+
+**次**: STSDを基準にTeacher Constructionを再設計し、実データで検証（GPT: Proceed to Teacher Construction based on STSD）。STSDの条件領域内で教師を抽出すれば数千倍にならないか（仮説）を検証。
+
+**確定値の現状**: edgeは依然ゼロ。教師集合は抽出したが、STSD基準でないため再構成対象。達成感を得る段階にない（ヨーク一貫）。
