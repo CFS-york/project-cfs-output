@@ -273,3 +273,27 @@ Construction →
 
 ## 凍結（Freeze Principle、CFS_CONSTITUTION第5条）
 Construction系OS（Construction Philosophy / Execution Discipline / Theory Construction）は凍結。議論で改訂せず、運用証拠でのみ改訂。次はこのOSを使ってTheory Construction（別LOT）を回す。
+
+---
+
+# Construction順序 修正（2026-06-25、Freeze Principle運用証拠による改訂）
+
+★第一LOT（Teacher Specification）着手時に判明: 上記Construction手順は `Goal→Theory` に直結しており、**Teacher Construction段階を欠いていた**（Theoryを教師データとの対話でなく空中で構成する誤り）。これはFreeze Principle（運用証拠による改訂）に該当する最初の改訂。議論で足したのでなく、第一LOTを組む運用で欠陥が判明した。
+
+## 修正後のConstruction順序
+```
+Goal
+ → Teacher Specification（教師の定義・近似方法。何をもってGoalが成立した市場世界とみなすか）
+ → Teacher Construction（神の目最適化で、制約下に教師＝成功市場世界の近似を構成）
+ → Teacher Analysis（教師を解析）
+ → Question（教師から問いが生まれる）
+ → Theory（その問いへの世界の説明。★教師との対話で形成、空中でない）
+ → Design Principle → Requirement → Optimization → 双方向Refinement
+ → Structure → Logic → Internal → External
+```
+★市場でなくGoalから。Theoryは出発点でなく、教師（成功市場世界の近似）との対話から形成される知識。
+
+## Teacher（教師）の定義
+- Teacher ＝ **Goalが成立した市場世界そのものの近似モデル**（単なるトレード履歴でない、トレーダーのedge集でもない）。
+- 神の目（未来既知）で、制約下に最終資産を最大化するトレード列。そこから後で「未来を知らなくても観測できる構造」を抽出する（教師なのは未来情報でなく**構造**）。
+- ★Teacherは「合格集合」でなく「**Goalへの連続体**」。10x未満（9.x倍）の教師も、Goalにほぼ到達した市場世界として保持する（10xでフィルタすると情報を失う＝Result Independence違反）。

@@ -50,6 +50,28 @@
 
 ---
 
+## ★★★★ Teacher Spec LOT（第一LOT）で出た失敗（2026-06-25）
+
+CFS初のConstruction系LOG着手で、以下が出た。全て既知の病の再発・新形態:
+
+- **GPTありき（迎合）**: GPTの提案（Teacher Specification等）を、ARK自身の検証なしに「正しそうだから」受諾し続けた。受諾の連続が迎合の連続だった。正しい流れは `GPT提案 → ARK自身の検証 → 採否判断 → 採用`。GPTは提案者、ARKが設計責任者。GPT提案を引用せず、Construction Philosophyだけで論証して採否を決める。
+
+- **論証の段階飛ばし（Stage Collapseの論証版）**: 第一LOTを何にするかの論証で、(1)依存関係の一軸だけで「第一歩」と結論→目的整合を飛ばした (2)目的整合の土台(Construction目的)を仮定のまま使った→Goalから演繹していなかった (3)演繹にedge(トレーダーの言葉)を突然持ち込んだ (4)「市場世界が存在する」と断定していた。GPTが一段ずつ深い前提を突き、Goalまで遡って演繹し直した。**結論に近い所で足場を組み、その足場が何に支えられるかを飛ばす癖**。
+
+- **トレーダーの言葉 vs 市場モデル**: edge/利益を生むトレード、という金融の発想で考えていた。CFSは市場世界をモデル化する研究。Goalから導くべきはedge（最後に抽出される手段）でなく「Goalが成立する市場世界」（最初に定義する）。
+
+- **存在を前提にする vs 存在し得るかを検証する vs 存在させる**: 「存在する」と断定（再現作業になる）も、「存在させる」（創造=Confirmation Biasの入口）も誤り。正しくは「存在し**得る**を前提に、存在するなら見つける覚悟で、事前定義した停止条件まで探索を尽くす」（CFS_CONSTITUTION第6条）。★ただし「存在し得るか」は逃げの言い訳にもなる（届かない→存在しない、で諦める）。事前定義した停止条件が逃げも執着も塞ぐ。
+
+- **Result Independence違反（憲法を運用初日に破る）**: Goal Constraintに「達成≥10x」を入れた＝結果(10x)で教師をフィルタした＝結果探索への回帰＝憲法第1条違反。10xは制約(探索空間を縛る)でなく結果(探索後の評価)。Evaluationへ移す。★正史化＝理解ではない。憲法を刻んでも、手を動かす最初の場面で破った。
+
+- **レイヤー圧縮 三度目**: Goal Constraint/Execution Constraintを潰した(Executionだけ)、Constraint/Parameterを潰した(α=5%を制約に混ぜた)。本日通算: ①Theory/Requirement ②Design Principle/Requirement ③Goal/Execution Constraint+Constraint/Parameter。**階層を分けず平らにする癖**。Stage Collapseの一形態候補だが昇格はまだ（Generalization Principle、複数日の事例を待つ）。
+
+- **Design Recallの誤診**: 「Recallが形骸化した」と自己診断したが誤り。Recallは正常に機能し、保持対象のOSが間違っていた（Simulation Construction欠落）。「順序ミス→Recall失敗」と結果から原因に飛んだ。Recall強化(チェック追加)でなくOS修正が本質（Management Drift回避）。
+
+- **哲学が手を動かさない言い訳になる**: 認識論(存在し得るか等)を何ターンも往復し、Teacherを一つも作らなかった。「目的が議論にすり替わる」。CFSは哲学の精緻さでなく、教師を構成して確かめることで進む。GPT監査も「論破ゲーム」になりかけた（GPT自身が認めた）。**目的(CFS達成)が議論に流れたら止め、手を動かす**。
+
+---
+
 ---
 
 ## 1. 旧体制 (正当価格 v4/v5、 block220-333、 〜2026-05-26)

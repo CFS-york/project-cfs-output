@@ -199,6 +199,31 @@ ARKは失念し、目先の話に条件反射して検証テーマが毎ター�
 - 総括: (Block 終了時に記入)
 - 終了条件: BREAKER 突破 + *_DEFINITION.md 永続化 (R-DEF)
 
+### ★★★★★★ [TEACHER-SPEC] [status: active] (2026-06-25、第一LOT。CFS初のConstruction系LOT。Teacher Specification=成功市場世界の定義)
+
+**★CFS初の「設計（Construction）」LOT**。これまでのM1/M2/M3/S2-Aは検証寄り。本LOTはConstruction Philosophy（CFS_CONSTITUTION第3条）に従い、Goalから設計する。GPT監査多数往復・APPROVED（Teacher ConstructionをOptimization Problemとして扱う設計思想を承認）。
+
+**Construction目的（Goalから演繹）**: Goalが成立する市場世界を教師として構成し、そこから（未来を知らなくても使える）構造を抽出すること。edge獲得でない（edgeは最後に抽出される）。
+
+**Teacher**: Goalが成立した市場世界の近似モデル。神の目（未来既知）で制約下に最終資産を最大化するトレード列。合格集合でなくGoalへの連続体（9.x倍も保持）。
+
+**Teacher Specification（確定仕様、GPT承認）**:
+- 成功定義: 16ヶ月（約344営業日）、初期30万→最大化、レバなし複利、現実約定可能
+- **Goal Constraint**: GC1 期間≤16ヶ月 / GC3 最大DD≤D_max（★GC2達成=10xは制約でなくEvaluationへ移動=Result Independence。10xを制約にすると結果でフィルタ＝憲法第1条違反）
+- **Execution Constraint**: EC1約定可能性(建玉≤売買代金×α) / EC2コスト(COST往復,TAX) / EC3 Gap(始値約定,gap回避させない=Teacher Reality核心) / EC4複利レバなし / EC5運用(同時保有≤K,最小額≥MIN_PER)
+- **目的関数**: 制約下で最終資産を最大化（★Optimization=制約下の最適解構成。結果探索=結果でフィルタ、とは違う）
+- **Parameter**（Constraintと分離）: T_months=16 / X_target=10 / D_max=未定(要検討) / α=5%(仮) / K,MIN_PER=未定
+- **Evaluation**（探索後）: 教師が10x到達したか判定（到達=存在の証拠 / 9.x倍=連続体として保持）
+- **停止条件**（事前定義、ARKが事後に決めない）: 探索範囲(全上場,流動性下限) / 計算予算 / 改善停止条件
+
+**実装方針**: 方針C（同時保有=1、貪欲法）で神の目の上限をまず見る。同時保有1の最適教師が10xに遠いなら分散を増やしても近づきにくい（分散はリスク低減でリターン上限を上げない）。最小実装で「存在し得るか」の最初の証拠を見る。神の目の上限すら10xに遠い→Goal厳しい。上限が10x超→問題は「未来を知らずにどこまで構造を捕らえられるか」に移る（本来のCFSの問い）。
+
+**次の一手**: 方針Cの最小実装スクリプト（adjo/adjc/vol読込→神の目最適リターン計算→貪欲複利→16ヶ月倍率）をヨークPCで走らせる。
+
+**総括**: (実装後記入)
+
+---
+
 ### ★★★★★ [S2-A] [status: active] (2026-06-25、信用期日構造=流動性が制度的に偏る構造の最初の実装検証)
 
 **★CFS初の構造探索LOT**。結果変数(右裾率)でなく、構造(制度が参加者に強いる繰り返し行動)を探索。CFS_CONSTITUTION v1 / 構造探索OS(CFS_EXPLORE_OS)に従う。GPT監査多数往復・APPROVED。
