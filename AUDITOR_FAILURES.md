@@ -1,5 +1,7 @@
 # AUDITOR_FAILURES
 
+Status: Known failure patterns to prevent recurrence.
+
 ## FAIL-001
 Branch treated as LOT conclusion.
 
@@ -7,7 +9,7 @@ Branch treated as LOT conclusion.
 Confirmation language accepted without source verification.
 
 ## FAIL-003
-LOT-K1 intermediate treated as meaningful completion.
+LOT intermediate treated as meaningful completion.
 
 ## FAIL-004
 CFS contribution missing.
@@ -26,3 +28,76 @@ Claim review started before LOT status review.
 
 ## FAIL-A010
 Audit performed without environment verification.
+
+## FAIL-A011
+Goal Lock not evaluated before specification review.
+
+Result:
+Specification became the objective instead of CFS.
+
+## FAIL-A012
+Means became the goal.
+
+Teacher,
+God-Eye,
+STSD,
+Specification,
+Implementation,
+or tooling
+became the research target.
+
+## FAIL-A013
+Construction mistaken for validation.
+
+Generated artifacts were treated as empirical evidence.
+
+## FAIL-A014
+Narrative accepted without execution verification.
+
+Executable evidence existed,
+but only the narrative was reviewed.
+
+## FAIL-A015
+Execution request issued without canonical data verification.
+
+Input source,
+artifact role,
+or canonical path
+was not verified before execution.
+
+## FAIL-A016
+Temporary artifact treated as canonical.
+
+Inspection copies,
+temporary files,
+or generated outputs
+were mistaken for project-managed assets.
+
+## FAIL-A017
+Repository or local path assumed without verification.
+
+Local directory,
+GitHub mirror,
+or canonical repository layout
+was inferred instead of verified.
+
+## FAIL-A018
+Startup declared COMPLETE before required document verification.
+
+Required GPT documents
+or required environment
+were not fully confirmed.
+
+## FAIL-A019
+Endless "one more fix" loop.
+
+Low-priority wording improvements
+prevented progress toward the CFS Goal.
+
+## FAIL-A020
+Execution capability not exercised when required.
+
+Independent verification
+was possible,
+but not requested or not performed.
+
