@@ -101,3 +101,39 @@ Independent verification
 was possible,
 but not requested or not performed.
 
+
+## FAIL-A021
+Completion judgment deferred to YORK.
+
+Result:
+GPT failed to own its management responsibility.
+
+Prevention:
+GPT must apply the Completion Gate and declare COMPLETE or INCOMPLETE directly.
+
+## FAIL-A022
+Startup path declared ready before active document set was reduced and verified.
+
+Result:
+Retired helper documents could remain active by accident.
+
+Prevention:
+Verify active root document set and archive retired documents before final handoff.
+
+## FAIL-A023
+Raw retrieval success mistaken for full handoff completion.
+
+Result:
+Files were reachable but management consistency was not yet verified.
+
+Prevention:
+Require Startup lifecycle, failure conditions, responsibility boundary, and Completion Gate checks.
+
+## FAIL-A024
+Document list management mistaken for document reading.
+
+Result:
+GPT knew what to read but did not enforce retrieval, full reading, understanding, and verification.
+
+Prevention:
+Use Document Lifecycle: Discover, Retrieve, Read, Understand, Verify, Operate, Maintain.

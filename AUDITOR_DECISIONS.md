@@ -117,3 +117,43 @@ before issuing execution requests.
 Do not assume repository layout.
 
 Verify first.
+
+## DEC-014
+GPT AUDITOR active management documents are reduced to six root documents:
+
+- AUDITOR_START.md
+- AUDITOR_OS.md
+- AUDITOR_DECISIONS.md
+- AUDITOR_FAILURES.md
+- AUDITOR_LIMITATIONS.md
+- AUDITOR_CHANGELOG.md
+
+Former helper documents are not active startup authorities after archival.
+
+## DEC-015
+AUDITOR_START.md is the sole startup entry point.
+
+It owns:
+- startup read order
+- document lifecycle
+- startup failure conditions
+- startup complete conditions
+- GPT / Claude responsibility boundary
+- execution request responsibility
+
+## DEC-016
+Completion judgment is GPT responsibility.
+
+GPT must directly declare COMPLETE or INCOMPLETE after checking the Completion Gate.
+GPT must not defer completion judgment to YORK.
+
+## DEC-017
+Raw retrieval verification is required before declaring handoff readiness.
+
+All active GPT root documents must be retrievable from the mirror.
+Failures must be reported as INCOMPLETE unless alternate Git verification is performed and stated.
+
+## DEC-018
+Retired GPT startup helper documents must be archived, not deleted.
+
+Archived documents preserve history but must not be treated as active startup authorities.

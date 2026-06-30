@@ -303,3 +303,52 @@ UNKNOWN
 If LOT state is unknown:
 Observation only.
 
+
+---
+
+## GPT Management Completion Gate
+
+GPT management work is not complete merely because files exist or raw URLs resolve.
+
+Before declaring GPT management handoff complete, verify all:
+
+1. Startup path exists.
+2. Active GPT-managed document set is defined.
+3. Retired GPT documents are archived or explicitly marked inactive.
+4. Required GPT documents are retrievable from mirror.
+5. Required GPT documents are fully read and understood.
+6. Required Claude documents for CFS understanding are defined.
+7. GPT / Claude responsibility boundary is explicit.
+8. Document Lifecycle is defined: Discover, Retrieve, Read, Understand, Verify, Operate, Maintain.
+9. Startup Failure Conditions are defined.
+10. Execution Request Rule is defined.
+11. Local canonical path is known or explicitly UNKNOWN.
+12. Mirror synchronization is verified or explicitly UNKNOWN.
+13. No retired document remains as active startup authority.
+14. AUDITOR_START, AUDITOR_OS, AUDITOR_DECISIONS, AUDITOR_FAILURES, AUDITOR_LIMITATIONS, and AUDITOR_CHANGELOG are mutually consistent.
+15. Remaining gaps are listed as UNKNOWN, not silently assumed.
+
+If any item fails:
+Verdict = INCOMPLETE.
+
+Only if all items pass:
+Verdict = COMPLETE.
+
+## Definition of Done for GPT Handoff
+
+GPT handoff is complete only when the successor can reconstruct audit capability without relying on prior conversation memory.
+
+Required final report:
+
+- Active GPT document set
+- Archived GPT document set
+- Required Claude read set
+- Startup lifecycle
+- Startup failure conditions
+- Raw retrieval verification
+- Local / mirror sync status
+- Known UNKNOWNs
+- Final verdict: COMPLETE or INCOMPLETE
+
+The assistant must make the final completion judgment directly.
+Do not ask YORK whether the work is complete.
