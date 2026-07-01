@@ -15,9 +15,33 @@
   - CFS2_RULES.md     (13条の原文)
   - CFS2_LEDGER.md    (cfs2の現在地=試行履歴)
   - sim_verify.py     (検証sim)
-実行環境:
-  - AUDITORはヨークPCで python を実行し、C:\mnt\data\cache\ を直接読む。
-    (CSVアップロード不要。sim_verifyのパスは C:\mnt\data\cache\ に設定済み)
+実行環境・分担(★今日の教訓を反映、往復ゼロで検証に入るため):
+  - cfs2文書は mirror から自力取得できる(手添付不要):
+    curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS2_GOAL.md
+    (RULES/LEDGER/STARTUP_V2 も同様。全て UTF-8、200)
+  - 実行分担(3者、交わらない):
+    ・ARK = 仮説を出す side。実データ検証には一切関与しない。
+    ・AUDITOR(あなた) = 検証の全部。signal_fnを書き、sim_verifyに載せた完成版を書き、(N,p,w,l)を測り判定。
+    ・ヨーク = 実行係。AUDITORの完成版を cfs2\scripts\ に保存し実行、標準出力をAUDITORに貼る。
+  - データ: sim_verify は C:\mnt\data\cache\ を直接読む(CSVアップロード不要)。
+
+★sim_verify.py の I/F(これを知らずに実行版を書くと関数名を推測して外す。今日の失敗):
+  関数構成:
+    load() -> base, m, s           # データ読込(base=価格出来高, m=margin, s=shortsale)
+    sim(base,m,s,signal_fn,exit_fn,start_idx,K) -> mult,Nt,p,w,l,mv,Nm   # ★実行エントリはsim()
+  sim()の返り値7つ: mult=最終倍率, Nt=N, p=勝率, w=平均勝ち, l=平均負け, mv=m, Nm=N×m
+  signal_fn の契約: signal_fn(t,O,C,V,MR,SS,N) -> 買いindexのlist
+    O,C,V,MR,SS は全て2D(日×銘柄)。MR[t]/SS[t]は横断ベクトル。V=売買代金(Va列)。
+  exit_fn: 保有期間。hold20なら lambda t: t+1+20
+  実行版の骨子(この形で書けば動く。run/verify/main等の関数は存在しない):
+    if __name__=="__main__":
+        base,m,s = load()
+        dates = np.sort(base["date"].unique()); starts=[0,len(dates)//3,2*len(dates)//3]
+        exit_fn = lambda t: t+1+20
+        for wi,si in enumerate(starts,1):
+            mult,Nt,p,w,l,mv,Nm = sim(base,m,s,YOUR_signal_fn,exit_fn,si,5)
+            print(f"窓{wi}: {mult:.2f}x N={Nt} p={p:.2f} w={w*100:.1f}% l={l*100:.1f}% Nxm={Nm:.2f}")
+  ★sim_verify.py本体はコードのためmirror非公開。AUDITOR起動時にヨークがチャットに1回貼る。
 ```
 ★GOAL/RULES/LEDGERの原文を添付しないと、理解テストがキット併記の答えの読み上げ(空返事)になる。必ず原文を渡す。
 
