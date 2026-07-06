@@ -103,3 +103,41 @@
 4. **CURRENT_BLOCK.md** … 進行中ブロック定義（最上部に10x目的を常時表示）
 5. **CFS3_INFRA.md**（本書） … 構造の一枚図
 新セッション起動 = この5枚を読む。以上。
+
+## 8. 機械的な構造・設計と「触るときの罠」（★2026-07-02 実測。次ARKが同じ時間を溶かさないため）
+この章は「何がどこにあるか(§1-7)」でなく「仕組みがどう動くか・触ると何が起きるか」を残す。
+今日ARKがここで丸一日を溶かした。同じ轍を踏ませないための機械的引き継ぎ。
+
+### 8.1 push_to_mirror.py の内部構造（195行）
+- パス定義: `ROOT=親の親` / `FILES_DIR=ROOT/ファイル2` / `CFS2_DIR` / `CFS3_DIR` / `ML_OUT=ROOT/ml_output`。
+- **SYNC_FILES**(個別ファイル list of (src, dst_rel)) と **SYNC_DIRS**(ディレクトリ list, shutil.copytreeで丸ごと)。
+- ★cfs3は SYNC_FILES定義の直後で `CFS3_DIR.glob("*.md")` を自動収集(2026-07-02改修)。個別登録は不要。
+  新しい正史.mdをcfs3\直下に作るだけで自動同期。scripts/results等サブフォルダは対象外(直下globのため)。
+- **token mask**: `_mask_token()` がTOKENを<TOKEN_MASKED>に置換してからprint(chat/log流出防止)。ログにトークンを出さない仕組み。
+- 処理: mirror repoを`git clone --depth 1`→SYNC_FILES/DIRSをコピー→`git add/commit/push`。差分なしならskip。
+- mirror repo = github.com/CFS-york/project-cfs-output (public, main branch)。認証は環境変数 MIRROR_REPO_TOKEN。
+
+### 8.2 git運用の罠（★今日ここで30分溶かした）
+- **同じmaster(private repo=github.com/CFS-york/project-cfs.git)に、複数の主体が触る**:
+  手動 push_to_mirror / auto_push_watcher(ファイル2監視) / run.py / 手動git push。
+  → 全員が pull せず push すると衝突する。対策として各所に `git -c rebase.autoStash=true pull --rebase origin master` が入っている。
+- **rebase破損の復旧手順**(今日の実例): `pull --rebase`が途中で壊れ `.git/rebase-merge/head-name` が読めず
+  `rebase --continue`も`--abort`も効かなくなる事故がある。復旧=**`Remove-Item -Recurse -Force .git\rebase-merge`** で
+  rebase状態フォルダを物理削除→素のmaster状態に戻る(コミットは失われない)→ 通常の commit + push。
+- private への大量ファイル(27MB)pushは、auditor_check/等の未コミット分がまとめてstageされることがある。git statusで確認してから。
+
+### 8.3 常駐(watcher自動起動)の環境要因（★結論: この環境では不可）
+- pythonwでのwatcher常駐は、cfs3_watcherも前任auto_push_watcherもWMIで全セッション確認して1つも生存せず=環境要因。
+- 試した全手段(全滅): PowerShell直pythonw / bat内 start"" / Popen DETACHED_PROCESS|CREATE_NO_WINDOW / タスクスケジューラ(cfs3_watcher_task, 前任cfs_watcherのXML完全コピー, 管理者登録成功も起動後消滅)。
+- **確実な代替=手動push** `python ml\push_to_mirror.py`(今日何度も成功)。cfs3正史は自動収集で確実に同期。
+- 深追い禁止(費用対効果)。復活させるなら環境側(ログオンセッション/pythonw初期化)を疑う。本体スクリプト修正では直らない。
+
+### 8.4 スクリプトの型（検証scriptを書くときの機械的作法）
+- 置き場所: 検証scriptは`cfs3\scripts\`(削除対象)。恒常部品は`cfs3\infra\`/`cfs3\bat\`。
+- 実行: `cd C:\mnt\data; python cfs3\scripts\cfs3_BN_NN_xxx.py`。環境はPowerShell(cmd構文と取り違え注意=今日多発)。
+- 較正必須: 合成世界で両側弁別(SIGNAL世界で検出/KILL世界で非検出)を確認してからpresent→本番。
+- code4はstr。look-ahead厳禁。COST=0.005/TAX=0.20315/BASE_SPREAD=0.0005。翌日寄付AdjO約定。LIQ_FRAC=0.01。
+
+### 8.5 この章の保守
+機械的構造を変えたら(mirror設計/常駐/git運用/データ経路)、必ずこの§8を更新してからmirror同期する。
+「引き継げない機械的構造」こそが最大の時間浪費源(2026-07-02の教訓)。
