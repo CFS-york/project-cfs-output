@@ -95,10 +95,15 @@ CFS3 v1.0までの設計思想は「AIの悪癖（失念・暴走推論・ハル
 
 ## 6. 運用（軽量固定）
 
-- **正史は3枚のみ**: CFS3_CORE.md（本書）/ CFS3_TEACHER_SPEC.md（合格ゲート）/ CFS3_LEDGER.md（検証台帳）
+- **正史**: CFS3_CORE.md（本書）/ CFS3_TEACHER_SPEC.md（合格ゲート）/ CFS3_LEDGER.md（検証台帳）
+  / CURRENT_BLOCK.md（進行中ブロック定義, 最上部に10x目的常時表示）/ CFS3_INFRA.md（構造の一枚図=環境/API/mirror/データ/置き場所）
+  ★INFRA.mdは「プロジェクト構造が引き継げていない」問題(2026-07-02ヨーク指摘)への恒久対策。次ARKが探し回らないための所在マップ。
 - 配置: `C:\mnt\data\cfs3\`。scriptは `C:\mnt\data\cfs3\scripts\`、結果は `C:\mnt\data\cfs3\results\`
 - LEDGERは事実（script名・日付・数表・合否）のみ。scriptの実行結果から機械的に追記。AIの解釈は書かない
-- 新セッション起動 = CORE・SPEC・LEDGERの3枚を読む。以上。自己テスト・儀式なし
+- 新セッション起動 = CORE・SPEC・LEDGER・CURRENT_BLOCK・INFRA の5枚を読む。以上。自己テスト・儀式なし
+- ★16ヶ月10xの目的をCURRENT_BLOCK最上部に常時表示し、毎スクリプト前に読む(§2.5「常に文脈に含む」の構造化)。
+  目的が文脈に無いと壁打ちに流れる(2026-07-02にB7で中間指標=元本目前で満足しかけた反省)。
+  ブロックテーマ・完遂条件・結果解釈は全てこの目的に照らす。中間指標での満足を自己検問する。
 - **mirror同期（2026-07-02 実態確定）**:
   - スクリプト実体: `C:\mnt\data\ml\push_to_mirror.py`（正史にパス未記載だった＝次ARKが探さぬよう明記）
   - mirror repo: `github.com/CFS-york/project-cfs-output`（URL/トークンは環境変数 MIRROR_REPO_URL/MIRROR_REPO_TOKEN に埋込済、聞く必要なし）
