@@ -20,7 +20,11 @@
 
 ## 2. ディレクトリ構成（C:\mnt\data 起点）
 - `cache\` … **参照データ**（§4）。全csv。
-- `cfs3\` … CFS3本体。`cfs3\CFS3_*.md`(正史) / `cfs3\CURRENT_BLOCK.md` / `cfs3\scripts\`(script65本+) / `cfs3\results\`(結果)
+- `cfs3\` … CFS3本体。`cfs3\CFS3_*.md`(正史) / `cfs3\CURRENT_BLOCK.md`
+  - `cfs3\infra\` … ★恒常部品(削除禁止): cfs3_watcher.py(常駐watcher本体)。ここは掃除対象外。
+  - `cfs3\bat\` … ★恒常: start_cfs3_watcher.bat(pythonw裏起動bat)。掃除対象外。
+  - `cfs3\scripts\` … ★削除対象フォルダ: 検証script(cfs3_BN_NN_xxx.py)を大量に作っては消す作業場。恒常部品は置かない。
+  - `cfs3\results\` … 結果。 `cfs3\*.log` … watcherログ。
 - `ml\` … mirror同期系。`push_to_mirror.py` / `auto_push_watcher.py` / `watcher.log` / `ml_output\`
 - `.github\workflows\` … GitHub Actions（`auto_handover.yml` 日次cron / `physics_check.yml`）
 - `scripts\` … 共通ユーティリティ（`show_sync_files.py`, `add_*_mirror.py`, `patch_sync_files.py`）
@@ -54,7 +58,16 @@
 - **push_to_mirror.py** (`ml\`): SYNC_FILESのファイルをmirrorへ同期。手動実行 `cd C:\mnt\data; python ml\push_to_mirror.py`。
   cfs3正史4枚+CFS3_INFRA.mdはSYNC_FILESに登録済(cfs3_add_mirror.py で追加)。
 - **auto_push_watcher.py** (`ml\`): `ファイル2\`を30秒毎監視し自動push。★cfs3は監視対象外(=cfs3は手動pushだった)。
-  → cfs3自動化はcfs3専用watcher追加で対応(2026-07-02, 別途)。
+  → cfs3自動化はcfs3専用watcher追加で対応(2026-07-02, ヨーク承認):
+    ・`cfs3\infra\cfs3_watcher.py`(★恒常フォルダ) … cfs3\直下の正史.md 5枚を30秒毎監視→変更検知で push_to_mirror 自動発火(実証済)。既存watcherの心臓部は無改造(独立プロセス)。
+    ・`cfs3\bat\start_cfs3_watcher.bat` … pythonwで裏起動(前任 ml\start_watcher.bat に準拠)。
+    ・常駐化(2026-07-02, 管理者権限不要のスタートアップ方式を採用): `cfs3\scripts\cfs3_register_startup.py` 実行で、スタートアップフォルダに start_cfs3_watcher.bat のショートカットを作成→次回ログオンから pythonw で裏起動(PowerShell不要)。※タスクスケジューラ方式(cfs3_register_task.py)は管理者権限が要り拒否されたため不採用。既存cfs_watcher(タスク方式)とは併存。
+    ・常駐起動: `cd C:\mnt\data; python cfs3\infra\launch_cfs3_watcher.py`(または bat\start_cfs3_watcher.bat)。
+    ★2026-07-02確定の教訓: PowerShellから直接pythonw も bat内 start "" も親セッション道連れで死ぬ環境。
+      唯一生存実証されたのは launch_cfs3_watcher.py の DETACHED_PROCESS|CREATE_NO_WINDOW フラグ付きPopen。起動は必ずこのlauncher経由。
+    ・launcherは多重起動防止(pythonwのコマンドライン照合)付き。pythonwはstdout=Noneなのでlog()はstdout有無ガード必須(修正済)。
+    ・手動push併用可: `python ml\push_to_mirror.py`。
+    ・解除: スタートアップの cfs3_watcher.lnk を削除。
 - **GitHub Actions** (`.github\workflows\auto_handover.yml`): 日次cron(JST23:59)でhandover生成+mirror push。
 - **raw参照**: `https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/<file>`（次ARKがweb_fetchで直接読める）
 - SYNC_FILES追加は前任の流儀に倣う(冪等・.bakバックアップ・アンカー挿入)。参考: scripts\add_*_mirror.py。
