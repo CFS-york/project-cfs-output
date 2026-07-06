@@ -68,6 +68,19 @@
     ・launcherは多重起動防止(pythonwのコマンドライン照合)付き。pythonwはstdout=Noneなのでlog()はstdout有無ガード必須(修正済)。
     ・手動push併用可: `python ml\push_to_mirror.py`。
     ・解除: スタートアップの cfs3_watcher.lnk を削除。
+
+    ★★ 2026-07-02 常駐化の結論(重要・次ARKは同じ袋小路を掘らないこと) ★★
+    - pythonwでのwatcher常駐は、この環境では維持できない。WMI(Win32_Process)で全セッション確認したところ、
+      cfs3_watcherだけでなく前任auto_push_watcherも含めpythonwプロセスが1つも生存していなかった(2026-07-02)。
+    - つまりcfs3_watcher.py固有の欠陥ではなく、pythonw+この環境の常駐が起動直後に終了する環境要因。
+      起動方法(PowerShell直/bat start""/Popen DETACHED/タスクスケジューラ)を全て試したが全滅。
+    - 試したこと(全て単独では常駐維持に至らず): stdout=Noneガード, __main__のFATALログ, DETACHED_PROCESS|CREATE_NO_WINDOW,
+      前任cfs_watcherのタスク定義XML完全コピー(cfs3_watcher_task, 管理者権限で登録成功したが起動後pythonw消滅)。
+    - **確実な代替=手動push**: `cd C:\mnt\data; python ml\push_to_mirror.py`。cfs3正史はSYNC_FILES登録済なので確実に同期される。
+      cfs3_watcher.py自体は python(前面・wなし)なら正常動作を実証済(自動同期も実証)。常駐したい時だけ前面起動で使う手もある。
+    - 次に常駐を復活させるなら: 環境側(ログオンセッションの張り方/pythonw初期化/タスクのRunLevel・LogonType)を疑う。
+      本体スクリプトの再修正では直らない(前任も同条件で生存していないため)。深追いは費用対効果に注意。
+    - 登録済タスク cfs3_watcher_task は残置(害はない)。不要なら schtasks /delete /tn cfs3_watcher_task /f (要管理者)。
 - **GitHub Actions** (`.github\workflows\auto_handover.yml`): 日次cron(JST23:59)でhandover生成+mirror push。
 - **raw参照**: `https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/<file>`（次ARKがweb_fetchで直接読める）
 - SYNC_FILES追加は前任の流儀に倣う(冪等・.bakバックアップ・アンカー挿入)。参考: scripts\add_*_mirror.py。
