@@ -58,7 +58,11 @@
 ## 5. GitHub mirror 同期の全体像
 - **repo**: `github.com/CFS-york/project-cfs-output`(public mirror, main branch)。URL/トークンは環境変数。
 - **push_to_mirror.py** (`ml\`): SYNC_FILESのファイルをmirrorへ同期。手動実行 `cd C:\mnt\data; python ml\push_to_mirror.py`。
-  cfs3正史4枚+CFS3_INFRA.mdはSYNC_FILESに登録済(cfs3_add_mirror.py で追加)。
+  ★2026-07-02 設計変更(ヨーク指摘「1個ずつ登録は漏れる温床=前任が壊した正体」への最適解):
+    cfs3直下の*.mdを glob で自動収集する方式に作り変えた(SYNC_FILES定義直後のループ)。
+    → cfs3\直下に新しい正史.mdを作れば個別登録なしで自動同期される。二度と登録漏れが起きない。
+    scripts\ results\ infra\ bat\ や .log/.py は直下.mdでないので対象外(mirrorが重くならない)。
+    バックアップ: push_to_mirror.py.bak_autoglob。個別登録に戻す必要はない(自動収集が上位互換)。
 - **auto_push_watcher.py** (`ml\`): `ファイル2\`を30秒毎監視し自動push。★cfs3は監視対象外(=cfs3は手動pushだった)。
   → cfs3自動化はcfs3専用watcher追加で対応(2026-07-02, ヨーク承認):
     ・`cfs3\infra\cfs3_watcher.py`(★恒常フォルダ) … cfs3\直下の正史.md 5枚を30秒毎監視→変更検知で push_to_mirror 自動発火(実証済)。既存watcherの心臓部は無改造(独立プロセス)。
