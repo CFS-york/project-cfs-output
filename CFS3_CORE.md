@@ -99,10 +99,18 @@ CFS3 v1.0までの設計思想は「AIの悪癖（失念・暴走推論・ハル
 - 配置: `C:\mnt\data\cfs3\`。scriptは `C:\mnt\data\cfs3\scripts\`、結果は `C:\mnt\data\cfs3\results\`
 - LEDGERは事実（script名・日付・数表・合否）のみ。scriptの実行結果から機械的に追記。AIの解釈は書かない
 - 新セッション起動 = CORE・SPEC・LEDGERの3枚を読む。以上。自己テスト・儀式なし
-- mirror同期はヨーク判断（既存push_to_mirror.pyのSYNC_FILESに3枚を追加するだけで可）
+- **mirror同期（2026-07-02 実態確定）**:
+  - スクリプト実体: `C:\mnt\data\ml\push_to_mirror.py`（正史にパス未記載だった＝次ARKが探さぬよう明記）
+  - mirror repo: `github.com/CFS-york/project-cfs-output`（URL/トークンは環境変数 MIRROR_REPO_URL/MIRROR_REPO_TOKEN に埋込済、聞く必要なし）
+  - 実行: `cd C:\mnt\data; python ml\push_to_mirror.py`。watcher(auto_push_watcher.py)とGitHub Actionsからも自動同期
+  - **cfs3正史4枚はSYNC_FILESに登録済**（CFS3_CORE/TEACHER_SPEC/LEDGER/CURRENT_BLOCK。2026-07-02 cfs3_add_mirror.pyで追加。それ以前は未登録で同期漏れしていた＝穴を修復済）
+  - SYNC_FILESへの追加は前任の流儀に倣う（冪等・.bakバックアップ・アンカー挿入）。参考: scripts/add_*_mirror.py, patch_sync_files.py, 確認は show_sync_files.py
+  - raw参照例: `https://raw.githubusercontent.com/CFS-york/project-cfs-output/main/CFS3_LEDGER.md`
+  - 新しい正史/重要scriptを作ったら SYNC_FILES 反映を忘れない（前任漏れの再発防止）
 
 ---
 
 ## 改訂履歴
 - 2026-07-02 v1.0 初版（CFS3発足）
 - 2026-07-02 v1.1 CFS3.1転換（§2.5追加）。悪癖の抑制→燃料化。人間がAIに迎合する役割反転。cfs3_001〜012の壁打ち全敗を受け、ARKの断定・飛躍を10xの筋書き生成に解放。軸=16ヶ月10xのみ不変
+- 2026-07-02 v1.2 §6 mirror運用を実態確定（push_to_mirror.pyパス明記・repo URL・cfs3をSYNC_FILESに登録＝それ以前の同期漏れを修復）。ブロック方式でB1〜B5完遂（F29〜F33）はLEDGER参照。壁の解像度: 舞台=高ボラ→選り分けは前向きで崩れる→幅の非対称は全fold持続だが頻度が逆→頻度はOHLCVで捉えられず→独立次元(需給)でsi(売残厚み)がAUC0.539=唯一の手がかりだが実益に届かず＋decile母集団自体が複利に不利
