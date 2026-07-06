@@ -35,7 +35,9 @@
 ## 3. 認証・秘匿情報（★値は絶対にscript出力/mirror/正史に書かない）
 - **J-Quants**: `C:\mnt\data\.env` の `JQUANTS_API_KEY`。プラン=Standard(¥3,300/月)固定。★追加課金NG(10x最終テストまで)。
   併存: `C:\mnt\data\jquants_credentials.json`（cache\にも同名コピー）。API V2 Light。
-- **Claude API**: `C:\mnt\data\Claude APIキー.txt`。$100使用済のため節約意識。
+- **Claude API**: ★2026-07-02 廃止(ヨーク判断)。ログ差分調整用にhandover_runner/physics_validatorで採用したが活用に至らず$100の負債を切った。
+  呼出元のGitHub Actions 2 workflow(auto_handover.yml/physics_check.yml)を.disabled化しprivate pushで停止→API課金ゼロ。
+  script本体は ml\retired\ へ退避(履歴保全)。`Claude APIキー.txt` は残置(害なし・再開余地)。再開するなら workflow を .yml に戻す。
 - **GitHub**: `C:\mnt\data\GitHub トークン.txt`。環境変数 `MIRROR_REPO_TOKEN`(設定あり)。
   ※.envはJQUANTS_API_KEYのみ。他は個別txt/環境変数に分散（この所在マップが無いと探せない=引き継ぎ穴の元凶だった）。
 
